@@ -9,6 +9,7 @@ use yii\web\Response;
 use yii\filters\VerbFilter;
 use app\models\LoginForm;
 use app\models\ContactForm;
+use app\models\Item;
 
 class SiteController extends Controller
 {
@@ -124,5 +125,55 @@ class SiteController extends Controller
     public function actionAbout()
     {
         return $this->render('about');
+    }
+
+    /**
+     * Displays about item list by type.
+     *
+     * @return string
+     */
+    public function actionList($type){
+        //запрос логина (да, не сделал через AccessControl)
+        if (Yii::$app->user->isGuest) {
+            Yii::$app->user->loginRequired();
+        }
+        //если были данные с формы на добавление, добавим элемент
+        $model = new Item;
+        $model->load(Yii::$app->request->post());
+        if ($model){
+            $model->save();
+        }
+        //найдем всех для вывода
+        if ($type == 'author') {
+            $type_id = 1;
+        } else {
+            $type_id = 2;
+        }
+        $items = Item::find()->where(['item_type_id' => $type_id])->all();
+        return $this->render('list', [
+            'type' => $type,
+            'items' => $items,
+        ]);
+    }
+
+    public function actionEdit($id){
+        if (Yii::$app->user->isGuest) {
+            Yii::$app->user->loginRequired();
+        }
+        $model = Item::findOne($id);
+        $answer = '';
+        if (Yii::$app->request->post()){
+            $model->load(Yii::$app->request->post());
+            if ($model){
+                if ($model->update()){
+                    $answer = 'Успешно отредактировано';
+                }
+            }
+        }
+
+        return $this->render('edit', [
+            'model' => $model,
+            'answer' => $answer,
+        ]);
     }
 }
