@@ -10,6 +10,11 @@ use yii\filters\VerbFilter;
 use app\models\LoginForm;
 use app\models\ContactForm;
 use app\models\Item;
+use app\models\Quote;
+use app\models\UploadForm;
+use yii\web\UploadedFile;
+
+
 
 class SiteController extends Controller
 {
@@ -100,55 +105,28 @@ class SiteController extends Controller
     }
 
     /**
-     * Displays contact page.
-     *
-     * @return Response|string
-     */
-    public function actionContact()
-    {
-        $model = new ContactForm();
-        if ($model->load(Yii::$app->request->post()) && $model->contact(Yii::$app->params['adminEmail'])) {
-            Yii::$app->session->setFlash('contactFormSubmitted');
-
-            return $this->refresh();
-        }
-        return $this->render('contact', [
-            'model' => $model,
-        ]);
-    }
-
-    /**
-     * Displays about page.
-     *
-     * @return string
-     */
-    public function actionAbout()
-    {
-        return $this->render('about');
-    }
-
-    /**
      * Displays about item list by type.
      *
      * @return string
      */
     public function actionList($type){
+        if ($type == 'author') {
+            $type_id = 1;
+        } else {
+            $type_id = 2;
+        }
+
         //запрос логина (да, не сделал через AccessControl)
         if (Yii::$app->user->isGuest) {
             Yii::$app->user->loginRequired();
         }
         //если были данные с формы на добавление, добавим элемент
         $model = new Item;
-        $model->load(Yii::$app->request->post());
-        if ($model){
+        if ($model->load(Yii::$app->request->post())){
             $model->save();
+            $this->redirect("/site/list?type={$type}");
         }
         //найдем всех для вывода
-        if ($type == 'author') {
-            $type_id = 1;
-        } else {
-            $type_id = 2;
-        }
         $items = Item::find()->where(['item_type_id' => $type_id])->all();
         return $this->render('list', [
             'type' => $type,
@@ -175,5 +153,91 @@ class SiteController extends Controller
             'model' => $model,
             'answer' => $answer,
         ]);
+    }
+
+    public function actionDelete($id){
+        if (Yii::$app->user->isGuest) {
+            Yii::$app->user->loginRequired();
+        }
+        $model = Item::findOne($id);
+        $answer = '';
+        if ($model->delete()){
+            $answer = 'Успешно удалено';
+            return $this->redirect(Yii::$app->request->referrer ?: Yii::$app->homeUrl);
+        } else {
+            $answer = 'Произошла ошибка';
+        }
+    }
+    
+    
+    public function actionQuotes(){
+        $quotes = Quote::find()->all();
+        $items = Item::find()->all();
+        Yii::$app->params['uploadPath'] = Yii::$app->basePath . '/web/uploads/';
+        if (Yii::$app->user->isGuest) {
+            Yii::$app->user->loginRequired();
+        }
+        //если были данные с формы на добавление, добавим элемент
+        $model = new Quote;
+        if ($model->load(Yii::$app->request->post())){
+            $image = UploadedFile::getInstance($model, 'img_src');
+            $model->img_src = $image->name;
+            $ext = end((explode(".", $image->name)));
+            $model->img_src = Yii::$app->security->generateRandomString().".{$ext}";
+            $path = Yii::$app->params['uploadPath'] . $model->img_src;
+            if ($model->save()){
+                if ($image){
+                    $image->saveAs($path);
+                }
+                //success saved file
+                $this->redirect('/site/quotes');
+            }
+        }
+        return $this->render('quotes', [
+            'quotes' => $quotes,
+            'items' => $items,
+        ]);
+    }
+
+    public function actionEditQuote($id){
+        Yii::$app->params['uploadPath'] = Yii::$app->basePath . '/web/uploads/';
+        if (Yii::$app->user->isGuest) {
+            Yii::$app->user->loginRequired();
+        }
+        $model = Quote::findOne($id);
+        $answer = '';
+        if (Yii::$app->request->post()){
+            $model->load(Yii::$app->request->post());
+            $image = UploadedFile::getInstance($model, 'img_src');
+            $model->img_src = $image->name;
+            $ext = end((explode(".", $image->name)));
+            $model->img_src = Yii::$app->security->generateRandomString().".{$ext}";
+            $path = Yii::$app->params['uploadPath'] . $model->img_src;
+            if ($model->update()){
+                if ($image){
+                    $image->saveAs($path);
+                }
+                $answer = 'Успешно отредактировано';
+            }
+        }
+
+        return $this->render('edit-quote', [
+            'model' => $model,
+            'answer' => $answer,
+        ]);
+    }
+
+    public function actionDeleteQuote($id){
+        if (Yii::$app->user->isGuest) {
+            Yii::$app->user->loginRequired();
+        }
+        $model = Quote::findOne($id);
+        $answer = '';
+        if ($model->delete()){
+            $answer = 'Успешно удалено';
+            return $this->redirect(Yii::$app->request->referrer ?: Yii::$app->homeUrl);
+        } else {
+            $answer = 'Произошла ошибка';
+        }
     }
 }

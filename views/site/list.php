@@ -24,6 +24,12 @@
                         <?php foreach ($items as $model): ?>
                             <div class="list-group-item clearfix">
                                 <span><?= $model->name; ?></span>
+                                <?= Html::beginForm(['/site/delete', 'id' => $model->id], 'post'); ?>
+                                <?= Html::submitButton(
+                                        'удалить',
+                                        ['class' => 'btn btn-danger pull-right']
+                                )?>
+                                <?= Html::endForm(); ?>
                                 <a href="<?= Url::to(['site/edit', 'id' => $model->id]) ?>" class="btn btn-primary pull-right">Редактировать</a>
                             </div>
                         <?php endforeach; ?>
@@ -40,7 +46,7 @@
                     <?= $form->field($model, 'item_type_id')->textInput(['type' => 'hidden', 'value' => $type == 'author' ? '1' : '2'])->label(false); ?>
                     <?= $form->field($model, 'description')->textInput()->label('Короткое описание (не обязательно)'); ?>
                     <div class="form-group">
-                        <?= Html::submitButton('Submit', ['class' => 'btn btn-primary']) ?>
+                        <?= Html::submitButton('Сохранить', ['class' => 'btn btn-primary']) ?>
                     </div>
                     <?php ActiveForm::end(); ?>
                 </div>
