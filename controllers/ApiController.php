@@ -71,6 +71,8 @@ class ApiController extends Controller
     }
 
     public function actionQuotes($items){
+        // return $items;
+        Yii::$app->response->format = Response::FORMAT_JSON;
         $req = JSON::decode($items);
         $models = Quote::find()->where(['in', 'item_id', $req])->all();
         foreach ($models as $key => $model){
@@ -79,6 +81,17 @@ class ApiController extends Controller
             $res[$key]['text_short'] = $model->text_short;
             $res[$key]['author_name'] = $model->getAuthorName();
         }
-        return JSON::encode($res);
+        return JSON::encode($res, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE);
+    }
+
+    public function actionQuote($id){
+        $model = Quote::findOne($id);
+        $this->layout = 'api';
+        if (!$id || !$model){
+            return 'wrong parameters';
+        }
+        return $this->render('quote', [
+            'model' => $model
+        ]);
     }
 }

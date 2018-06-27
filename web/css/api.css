@@ -1,0 +1,17 @@
+.container{
+    padding: 0 10px;
+    font-family: -apple-system, Helvetica, Roboto, sans-serif, Arial;
+}
+.img-wrap{
+    position: relative;
+    text-align: center;
+    margin-bottom: 15px;
+}
+.img-wrap img{
+    display: block;
+    max-width: 100%;
+    margin: auto;
+}
+.title{
+    text-align: center;
+}
