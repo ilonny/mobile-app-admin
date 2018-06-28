@@ -72,16 +72,36 @@ class ApiController extends Controller
 
     public function actionQuotes($items){
         // return $items;
-        Yii::$app->response->format = Response::FORMAT_JSON;
-        $req = JSON::decode($items);
-        $models = Quote::find()->where(['in', 'item_id', $req])->all();
+        // Yii::$app->response->format = Response::FORMAT_JSON;
+        if ($items == '[all]'){
+            $models = Quote::find()->all();
+        } else {
+            $req = JSON::decode($items);
+            $models = Quote::find()->where(['in', 'item_id', $req])->all();
+        }
         foreach ($models as $key => $model){
             $res[$key]['id'] = $model->id;
             $res[$key]['title'] = $model->title;
             $res[$key]['text_short'] = $model->text_short;
             $res[$key]['author_name'] = $model->getAuthorName();
         }
-        return JSON::encode($res, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE);
+        // return JSON::encode($res, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE);
+        return JSON::encode($res);
+    }
+
+    public function actionFavorites($items){
+        // return $items;
+        // Yii::$app->response->format = Response::FORMAT_JSON;
+        $req = JSON::decode($items);
+        $models = Quote::find()->where(['in', 'id', $req])->all();
+        foreach ($models as $key => $model){
+            $res[$key]['id'] = $model->id;
+            $res[$key]['title'] = $model->title;
+            $res[$key]['text_short'] = $model->text_short;
+            $res[$key]['author_name'] = $model->getAuthorName();
+        }
+        // return JSON::encode($res, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE);
+        return JSON::encode($res);
     }
 
     public function actionQuote($id){
