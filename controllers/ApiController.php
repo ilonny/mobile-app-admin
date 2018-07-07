@@ -12,6 +12,7 @@ use app\models\ContactForm;
 use app\models\Item;
 use app\models\Quote;
 use app\models\UploadForm;
+use app\models\Token;
 use yii\web\UploadedFile;
 use yii\helpers\Json;
 
@@ -113,5 +114,27 @@ class ApiController extends Controller
         return $this->render('quote', [
             'model' => $model
         ]);
+    }
+
+    public function actionSetToken($token, $settings){
+        //safe or update
+        $model = Token::find()->where(['token' => $token])->one();
+        if (!$model){
+            $model = new Token();
+            $model->token = $token;
+            $model->settings = $settings;
+            if ($model->save()){
+                return 'success';
+            } else {
+                return 'error';
+            }
+        } else {
+            $model->settings = $settings;
+            if ($model->update()){
+                return 'success';
+            } else {
+                return 'error12';
+            }
+        }
     }
 }
