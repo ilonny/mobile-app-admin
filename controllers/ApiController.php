@@ -118,11 +118,14 @@ class ApiController extends Controller
 
     public function actionSetToken($token, $settings){
         //safe or update
+        $token_clear = json_decode($token);
+        $token_clear = $token_clear->token;
         $model = Token::find()->where(['token' => $token])->one();
         if (!$model){
             $model = new Token();
             $model->token = $token;
             $model->settings = $settings;
+            $model->other = $token_clear;
             if ($model->save()){
                 return 'success';
             } else {
