@@ -12,6 +12,8 @@ use app\models\ContactForm;
 use app\models\Item;
 use app\models\Quote;
 use app\models\UploadForm;
+use app\models\Token;
+use app\models\Push;
 use yii\web\UploadedFile;
 
 
@@ -185,6 +187,9 @@ class SiteController extends Controller
             $ext = end((explode(".", $image->name)));
             $model->img_src = Yii::$app->security->generateRandomString().".{$ext}";
             $path = Yii::$app->params['uploadPath'] . $model->img_src;
+            // var_dump($model->item_id);
+            // die();
+            Token::sendPushForGroup($model->item_id, $model->text_short);
             if ($model->save()){
                 if ($image){
                     $image->saveAs($path);
@@ -197,6 +202,10 @@ class SiteController extends Controller
             'quotes' => $quotes,
             'items' => $items,
         ]);
+    }
+
+    public function actionPush(){
+
     }
 
     public function actionEditQuote($id){

@@ -67,7 +67,7 @@ class PushController extends Controller
         }
         function send_ios_push($message) {
             $sound = 'default';
-            $development = true;
+            $development = false;
             $payload = array();
             $payload["aps"] = array('alert' => $message, 'sound' => $sound);
             $payload = json_encode($payload);
@@ -82,9 +82,8 @@ class PushController extends Controller
                 $apns_cert = 'apns-dev.pem';
             } else {
                 $apns_url = 'gateway.push.apple.com';
-                $apns_cert = 'apns-cert-actual2222.pem';
+                $apns_cert = 'apns-prod.pem';
             }
-
             if (file_exists($apns_cert)) 
             echo("cert file exists\n"); 
             else 
@@ -97,17 +96,17 @@ class PushController extends Controller
             $apns = stream_socket_client('ssl://' . $apns_url . ':' . $apns_port, $error, $error_string, 2, STREAM_CLIENT_CONNECT, $stream_context);
             
             $device_tokens =array(
-                "3b719cc7885443632ff082907c9e1e718355c9f37cc74f3a62a71d4c4b52c4a4",
+                "6239f75466558adec9e518f5daacf97410b57968b74dfce43e430308939bf255",
             );
         
             foreach($device_tokens as $device) {
-            $apns_message = chr(0) . chr(0) . chr(32) . pack('H*', str_replace(' ', '', $device)) . chr(0) . chr(strlen($payload)) . $payload;
-            if (fwrite($apns, $apns_message)) {
-                $success++;
-                echo("sent\n");
-            } else {
-                echo("failed \n");
-            }
+                $apns_message = chr(0) . chr(0) . chr(32) . pack('H*', str_replace(' ', '', $device)) . chr(0) . chr(strlen($payload)) . $payload;
+                if (fwrite($apns, $apns_message)) {
+                    $success++;
+                    echo("sent\n");
+                } else {
+                    echo("failed \n");
+                }
             }
             echo("fetch done\n"); 
             socket_close($apns);
