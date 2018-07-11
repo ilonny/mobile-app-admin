@@ -205,7 +205,17 @@ class SiteController extends Controller
     }
 
     public function actionPush(){
-
+        $pushes = Push::find()->all();
+        $model = new Push;
+        if ($model->load(Yii::$app->request->post())){
+            if ($model->save()){
+                Token::sendPushForAll($model->payload);
+                $this->redirect('/site/push');
+            }
+        }
+        return $this->render('push', [
+            'pushes' => $pushes,
+        ]);
     }
 
     public function actionEditQuote($id){
