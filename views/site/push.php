@@ -45,7 +45,7 @@
                         $form = ActiveForm::begin();
                         $model = new Push;
                     ?>
-                    <?= $form->field($model, 'payload')->textInput()->label('Текст уведомления (желательно не больше 200 символов'); ?>
+                    <?= $form->field($model, 'payload')->textInput()->label('Текст уведомления (желательно не больше 120 символов'); ?>
                     <div class="form-group">
                         <?= Html::submitButton('Отправить', ['class' => 'btn btn-primary']) ?>
                     </div>

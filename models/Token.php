@@ -69,7 +69,7 @@ class Token extends \yii\db\ActiveRecord
             $development = false;
             $payload = array();
             $payload["aps"] = array('alert' => $message, 'sound' => $sound);
-            $payload = json_encode($payload);
+            $payload = json_encode($payload, JSON_UNESCAPED_UNICODE);
             $payload = preg_replace_callback('/\\\\u([0-9a-f]{4})/i', 'replace_unicode_escape_sequence', $payload);
             $apns_url = NULL;
             $apns_cert = NULL;
@@ -130,12 +130,12 @@ class Token extends \yii\db\ActiveRecord
             $development = false;
             $payload = array();
             $payload["aps"] = array('alert' => $message, 'sound' => $sound);
-            $payload = json_encode($payload);
+            $payload = json_encode($payload, JSON_UNESCAPED_UNICODE);
             $payload = preg_replace_callback('/\\\\u([0-9a-f]{4})/i', 'replace_unicode_escape_sequence', $payload);
             $apns_url = NULL;
             $apns_cert = NULL;
             $apns_port = 2195;
-        
+            // var_dump($payload);die();
             if($development) {
                 $apns_url = 'gateway.sandbox.push.apple.com';
                 $apns_cert = 'apns-dev.pem';
