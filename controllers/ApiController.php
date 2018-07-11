@@ -75,10 +75,10 @@ class ApiController extends Controller
         // return $items;
         // Yii::$app->response->format = Response::FORMAT_JSON;
         if ($items == '[all]'){
-            $models = Quote::find()->all();
+            $models = Quote::find()->orderBy('id DESC')->all();
         } else {
             $req = JSON::decode($items);
-            $models = Quote::find()->where(['in', 'item_id', $req])->all();
+            $models = Quote::find()->where(['in', 'item_id', $req])->orderBy('id DESC')->all();
         }
         foreach ($models as $key => $model){
             $res[$key]['id'] = $model->id;
