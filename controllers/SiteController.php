@@ -226,12 +226,18 @@ class SiteController extends Controller
         $model = Quote::findOne($id);
         $answer = '';
         if (Yii::$app->request->post()){
+            $prev_img = $model->img_src;
             $model->load(Yii::$app->request->post());
-            $image = UploadedFile::getInstance($model, 'img_src');
-            $model->img_src = $image->name;
-            $ext = end((explode(".", $image->name)));
-            $model->img_src = Yii::$app->security->generateRandomString().".{$ext}";
-            $path = Yii::$app->params['uploadPath'] . $model->img_src;
+            // var_dump($prev_img);
+            if ($image = UploadedFile::getInstance($model, 'img_src')){
+                $image = UploadedFile::getInstance($model, 'img_src');
+                $model->img_src = $image->name;
+                $ext = end((explode(".", $image->name)));
+                $model->img_src = Yii::$app->security->generateRandomString().".{$ext}";
+                $path = Yii::$app->params['uploadPath'] . $model->img_src;
+            } else {
+                $model->img_src = $prev_img;
+            }
             if ($model->update()){
                 if ($image){
                     $image->saveAs($path);
@@ -239,7 +245,8 @@ class SiteController extends Controller
                 $answer = 'Успешно отредактировано';
             }
         }
-
+        // var_dump($model->img_src);
+        // die();
         return $this->render('edit-quote', [
             'model' => $model,
             'answer' => $answer,
