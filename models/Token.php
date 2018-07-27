@@ -171,10 +171,7 @@ class Token extends \yii\db\ActiveRecord
                 $tokens_android[] = $model->other;
             }
         }
-            $message = [
-                'body' => $payload_text,
-                'title' => 'test_title'
-            ];
+            $message = $payload_text;
             $sound = 'default';
             $development = false;
             $payload = array();
