@@ -120,6 +120,14 @@ class ApiController extends Controller
         //safe or update
         $token_clear = json_decode($token);
         $token_clear = $token_clear->token;
+        if (!$token_clear){
+            $token = str_replace('"', '', $token);
+            $token_arr['token'] = $token;
+            $token_arr['os'] = 'android';
+            $token = $token_arr;
+            $token_clear = $token['token'];
+            $token = json_encode($token);
+        }
         $model = Token::find()->where(['token' => $token])->one();
         if (!$model){
             $model = new Token();

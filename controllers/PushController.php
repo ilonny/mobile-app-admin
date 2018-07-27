@@ -116,4 +116,18 @@ class PushController extends Controller
         
         send_ios_push('ты пидор');
     }
+    public function actionDailyPush(){
+        $settings = Item::find()->all();
+        foreach($settings as $setting){
+            //для каждого автора найдем список цитат
+            $quotes = Quote::find()->andWhere(['item_id' => $setting->id])->all();
+            //возьмем из них рандомную
+            $rand_id = rand(0, count($quotes)-1);
+            $quote = $quotes[$rand_id];
+            if ($quote->text_short){
+                Token::sendPushForGroupAndroid($setting->id, $quote->text_short);
+                Token::sendPushForGroup($setting->id, $quote->text_short);
+            }
+        }
+    }
 }

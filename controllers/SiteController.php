@@ -189,6 +189,7 @@ class SiteController extends Controller
             $path = Yii::$app->params['uploadPath'] . $model->img_src;
             // var_dump($model->item_id);
             // die();
+            Token::sendPushForGroupAndroid($setting->id, $quote->text_short);
             Token::sendPushForGroup($model->item_id, $model->text_short);
             if ($model->save()){
                 if ($image){
@@ -209,6 +210,7 @@ class SiteController extends Controller
         $model = new Push;
         if ($model->load(Yii::$app->request->post())){
             if ($model->save()){
+                Token::sendPushForAllAndroid($model->payload);
                 Token::sendPushForAll($model->payload);
                 $this->redirect('/site/push');
             }
