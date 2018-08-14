@@ -38,12 +38,13 @@ AppAsset::register($this);
     echo Nav::widget([
         'options' => ['class' => 'navbar-nav navbar-right'],
         'items' => [
-            ['label' => 'Авторы', 'url' => ['/site/list', 'type' => 'author']],            
-            ['label' => 'Книги', 'url' => ['/site/list', 'type' => 'books']],            
-            ['label' => 'Цитаты', 'url' => ['/site/quotes']],            
+            ['label' => 'Авторы', 'url' => ['/site/list', 'type' => 'author']],
+            ['label' => 'Книги', 'url' => ['/site/list', 'type' => 'books']],
+            ['label' => 'Цитаты', 'url' => ['/site/quotes']],
+            ['label' => 'Читалка', 'url' => ['/reader/index']],
             Yii::$app->user->isGuest ? (
                 ['label' => 'Войти', 'url' => ['/site/login']]
-            ) : (   
+            ) : (
                 '<li>'
                 . Html::beginForm(['/site/logout'], 'post')
                 . Html::submitButton(
@@ -69,9 +70,9 @@ AppAsset::register($this);
 
 <footer class="footer">
     <div class="container">
-        <p class="pull-left">&copy; My Company <?= date('Y') ?></p>
+        <p class="pull-left">&copy; Guru Online <?= date('Y') ?></p>
 
-        <p class="pull-right"><?= Yii::powered() ?></p>
+        <p class="pull-right">Created by <a href="https://fflames.ru" target="_blank">Flames Digital Agency</a></p>
     </div>
 </footer>
 

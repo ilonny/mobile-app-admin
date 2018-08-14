@@ -27,10 +27,15 @@ $this->title = 'Mobile app Admin Panel';
                 <p>Добавление и редактирование цитат</p>
                 <p><a class="btn btn-default" href="<?= Url::to(['site/quotes']); ?>">Перейти</a></p>
             </div>
-            <div class="col-xs-12">
+            <div class="col-lg-4 col-xs-12">
                 <h2>Push - Уведомления</h2>
                 <p>Создание push-уведомлений, просмотр истории уведомлений</p>
                 <p><a class="btn btn-default" href="<?= Url::to(['site/push']); ?>">Перейти</a></p>
+            </div>
+            <div class="col-lg-4 col-xs-12">
+                <h2>Epub читалка</h2>
+                <p>Редактирование авторов, редактирование книг</p>
+                <p><a class="btn btn-default" href="<?= Url::to(['reader/index']); ?>">Перейти</a></p>
             </div>
         </div>
     </div>
