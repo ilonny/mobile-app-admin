@@ -6,6 +6,9 @@ use Yii;
 use yii\helpers\Json;
 use yii\web\Controller;
 use app\models\ReaderAuthor;
+use app\models\ReaderBook;
+use app\models\UploadForm;
+use yii\web\UploadedFile;
 
 
 class ReaderController extends Controller
@@ -32,14 +35,27 @@ class ReaderController extends Controller
 
     public function actionBooks(){
         //если были данные с формы на добавление, добавим элемент
-        // $model = new ReaderAuthor;
-        // if ($model->load(Yii::$app->request->post())){
-        //     $model->save();
-        //     $this->redirect("/reader/authors");
-        // }
-        // $authors = ReaderAuthor::find()->all();
+        $model = new ReaderBook();
+        $uploadModel = new UploadForm();
+        if (Yii::$app->request->isPost) {
+            $uploadModel->file = UploadedFile::getInstance($uploadModel, 'file');
+            if ($uploadModel->file && $uploadModel->validate() &&  $uploadModel->file->extension == 'epub') {
+                $fileName = 'uploads/' . $uploadModel->file->baseName . '_' . uniqid() . '.' . $uploadModel->file->extension;
+                if ($uploadModel->file->saveAs($fileName)) {
+                    $model->file_src = $fileName;
+                }
+            }
+
+            if ($model->load(Yii::$app->request->post()) && $model->save()) {
+                return $this->redirect('/reader/books');
+            }
+        }
+        $books = ReaderBook::find()->all();
+        
         return $this->render('books', [
-            // 'authors' => $authors,
+            'books' => $books,
+            'model' => $model,
+            'uploadModel' => $uploadModel,
         ]);
     }
 
