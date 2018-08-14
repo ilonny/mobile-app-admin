@@ -13,6 +13,8 @@ use Yii;
  * @property int $reader_author_id
  * @property string $file_src
  * @property string $other
+ *
+ * @property ReaderAuthor $readerAuthor
  */
 class ReaderBook extends \yii\db\ActiveRecord
 {
@@ -33,6 +35,7 @@ class ReaderBook extends \yii\db\ActiveRecord
             [['name', 'file_src'], 'required'],
             [['name', 'description', 'file_src', 'other'], 'string'],
             [['reader_author_id'], 'integer'],
+            [['reader_author_id'], 'exist', 'skipOnError' => true, 'targetClass' => ReaderAuthor::className(), 'targetAttribute' => ['reader_author_id' => 'id']],
         ];
     }
 
@@ -49,5 +52,13 @@ class ReaderBook extends \yii\db\ActiveRecord
             'file_src' => 'File Src',
             'other' => 'Other',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getReaderAuthor()
+    {
+        return $this->hasOne(ReaderAuthor::className(), ['id' => 'reader_author_id']);
     }
 }

@@ -22,17 +22,18 @@
             </ul>
             <div class="tab-content">
                 <div id="list" class="tab-pane fade in active list-group">
-                    <?php if ($authors): ?>
-                        <?php foreach ($authors as $model): ?>
+                    <?php if ($books): ?>
+                        <?php foreach ($books as $model): ?>
                             <div class="list-group-item clearfix">
                                 <span><?= $model->name; ?></span>
-                                <?= Html::beginForm(['/site/delete', 'id' => $model->id], 'post'); ?>
+                                <br><span>Автор: <?= $model->readerAuthor->name; ?> </span>
+                                <?= Html::beginForm(['/reader/delete', 'id' => $model->id], 'post'); ?>
                                 <?= Html::submitButton(
                                         'удалить',
                                         ['class' => 'btn btn-danger pull-right']
                                 )?>
                                 <?= Html::endForm(); ?>
-                                <a href="<?= Url::to(['site/edit', 'id' => $model->id]) ?>" class="btn btn-primary pull-right">Редактировать</a>
+                                <a href="<?= Url::to(['reader/edit', 'id' => $model->id]) ?>" class="btn btn-primary pull-right">Редактировать</a>
                             </div>
                         <?php endforeach; ?>
                     <?php else: ?>
