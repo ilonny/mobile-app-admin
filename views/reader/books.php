@@ -23,19 +23,34 @@
             <div class="tab-content">
                 <div id="list" class="tab-pane fade in active list-group">
                     <?php if ($books): ?>
-                        <?php foreach ($books as $model): ?>
-                            <div class="list-group-item clearfix">
-                                <span><?= $model->name; ?></span>
-                                <br><span>Автор: <?= $model->readerAuthor->name; ?> </span>
-                                <?= Html::beginForm(['/reader/delete', 'id' => $model->id], 'post'); ?>
-                                <?= Html::submitButton(
-                                        'удалить',
-                                        ['class' => 'btn btn-danger pull-right']
-                                )?>
-                                <?= Html::endForm(); ?>
-                                <a href="<?= Url::to(['reader/edit', 'id' => $model->id]) ?>" class="btn btn-primary pull-right">Редактировать</a>
-                            </div>
-                        <?php endforeach; ?>
+                        <table class="table table-striped table-bordered" id="data-table" style="margin: 30px 0;">
+                            <thead>
+                                <tr>
+                                    <th>Заголовок</th>
+                                    <th>Описание</th>
+                                    <th>Автор</th>
+                                    <th>Действие</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($books as $model): ?>
+                                    <tr>
+                                        <td><?= $model->name; ?></td>
+                                        <td><?= $model->description; ?></td>
+                                        <td><?= $model->readerAuthor->name; ?></td>
+                                        <td>
+                                            <?= Html::beginForm(['/reader/delete', 'id' => $model->id], 'post'); ?>
+                                            <?= Html::submitButton(
+                                                    'удалить',
+                                                    ['class' => 'btn btn-danger pull-right']
+                                            )?>
+                                            <?= Html::endForm(); ?>
+                                            <a href="<?= Url::to(['reader/edit', 'id' => $model->id]) ?>" class="btn btn-primary pull-right">Редактировать</a>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
                     <?php else: ?>
                         <h2>Ничего не найдено</h2>
                     <?php endif; ?>

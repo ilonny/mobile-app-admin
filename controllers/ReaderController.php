@@ -15,7 +15,7 @@ class ReaderController extends Controller
 {
 
     public $enableCsrfValidation = false;
-    
+
     public function actionIndex(){
         return $this->render('index');
     }
@@ -51,7 +51,7 @@ class ReaderController extends Controller
             }
         }
         $books = ReaderBook::find()->all();
-        
+
         return $this->render('books', [
             'books' => $books,
             'model' => $model,
@@ -76,7 +76,7 @@ class ReaderController extends Controller
                 return $this->redirect('/reader/books');
             }
         }
-        
+
         return $this->render('edit', [
             'model' => $model,
             'uploadModel' => $uploadModel,
@@ -87,7 +87,7 @@ class ReaderController extends Controller
         $model = ReaderBook::findOne($id);
         if ($model->delete()) {
             return $this->redirect('/reader/books');
-        }       
+        }
     }
 
 }
