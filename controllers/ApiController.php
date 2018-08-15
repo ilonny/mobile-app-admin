@@ -13,6 +13,7 @@ use app\models\Item;
 use app\models\Quote;
 use app\models\UploadForm;
 use app\models\Token;
+use app\models\ReaderBook;
 use yii\web\UploadedFile;
 use yii\helpers\Json;
 
@@ -147,5 +148,29 @@ class ApiController extends Controller
                 return 'error12';
             }
         }
+    }
+
+    public function actionGetReaderBooks(){
+        $books = ReaderBook::find()->all();
+        $books_arr = [];
+        foreach ($books as $book){
+            array_push($books_arr, [
+                'id' => $book->id,
+                'name' => $book->name,
+                'description' => $book->description,
+                'author' => $book->readerAuthor->name,
+            ]);
+        }
+        return json_encode($books_arr, JSON_UNESCAPED_UNICODE);
+    }
+
+    public function actionGetReaderBook($id){
+        $book = ReaderBook::findOne($id);
+        if (!is_file("$book->file_src")) {
+            throw new \yii\web\NotFoundHttpException('The file does not exists.');
+        }
+        return Yii::$app->response->sendFile("$book->file_src", 'book.epub');
+        // return var_dump($book);
+
     }
 }
