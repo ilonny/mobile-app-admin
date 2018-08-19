@@ -71,7 +71,7 @@ class Token extends \yii\db\ActiveRecord
             $sound = 'default';
             $development = false;
             $payload = array();
-            $payload["aps"] = array('alert' => $message, 'sound' => $sound);
+            $payload["aps"] = array('quote_id' => $model->id, 'alert' => $message, 'sound' => $sound);
             $payload = json_encode($payload, JSON_UNESCAPED_UNICODE);
             // $payload = preg_replace_callback('/\\\\u([0-9a-f]{4})/i', 'replace_unicode_escape_sequence', $payload);
             // $apns_url = NULL;
