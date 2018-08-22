@@ -107,6 +107,7 @@ class ApiController extends Controller
     }
 
     public function actionQuote($id){
+        $id = intval($id);
         $model = Quote::findOne($id);
         $this->layout = 'api';
         if (!$id || !$model){

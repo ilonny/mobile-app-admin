@@ -65,7 +65,8 @@ class ReaderController extends Controller
         $uploadModel = new UploadForm();
         if (Yii::$app->request->isPost) {
             $uploadModel->file = UploadedFile::getInstance($uploadModel, 'file');
-            if ($uploadModel->file && $uploadModel->validate() &&  $uploadModel->file->extension == 'epub') {
+            // var_dump($uploadModel);die();
+            if ($uploadModel->file /* && $uploadModel->validate()  &&  $uploadModel->file->extension == 'epub' */) {
                 $fileName = 'uploads/' . $uploadModel->file->baseName . '_' . uniqid() . '.' . $uploadModel->file->extension;
                 if ($uploadModel->file->saveAs($fileName)) {
                     $model->file_src = $fileName;

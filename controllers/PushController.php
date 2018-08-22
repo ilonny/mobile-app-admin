@@ -126,7 +126,7 @@ class PushController extends Controller
             $quote = $quotes[$rand_id];
             if ($quote->text_short){
                 Token::sendPushForGroupAndroid($setting->id, $quote->text_short);
-                Token::sendPushForGroup($setting->id, $quote->text_short);
+                Token::sendPushForGroup($setting->id, $quote->text_short, $quote->id);
             }
         }
     }
