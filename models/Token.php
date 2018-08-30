@@ -119,7 +119,7 @@ class Token extends \yii\db\ActiveRecord
             // return $success;
     }
 
-    public function sendPushForGroupAndroid($setting, $payload_text, $quote_id = null){
+    public function sendPushForGroupAndroid($setting, $payload_text, $quote_id = null, $quote_title = null){
         $models = Token::find()
         ->where([
             'or',
@@ -147,9 +147,11 @@ class Token extends \yii\db\ActiveRecord
                     'body' => array(
                         'text' => $payload_text,
                         'q_id' => intval($quote_id),
-                    )
+                    ),
+                    'title' => $quote_title
                 )
             );
+            var_dump($android_push_body);
             $android_push_body = json_encode($android_push_body, JSON_UNESCAPED_UNICODE);
             $ch = curl_init('https://fcm.googleapis.com/fcm/send');
             curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
@@ -160,6 +162,7 @@ class Token extends \yii\db\ActiveRecord
                 'Authorization: key=AAAAmLg0GRc:APA91bGaOgw6-8zB6Q_o7A-Qf5BU7ofEQqM5UoMAgIySYgcFQ3aS1z9V9W-Wk9Xa9qRrqaQ47qfo7tzAi4uY-4IzgAPpesbwVOYZQ4QX94VFCQvGLpSS4qaOwJpritlwf-n7BWsvH5jO9sKZAyA56vdcL1Gt1mlKtg'
             ));
             $response = curl_exec($ch);
+            // die();
         }
         // var_dump($response);
         file_put_contents('debug.txt', json_encode($response), FILE_APPEND);
