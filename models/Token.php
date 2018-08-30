@@ -119,7 +119,7 @@ class Token extends \yii\db\ActiveRecord
             // return $success;
     }
 
-    public function sendPushForGroupAndroid($setting, $payload_text){
+    public function sendPushForGroupAndroid($setting, $payload_text, $quote_id = null){
         $models = Token::find()
         ->where([
             'or',
@@ -144,8 +144,11 @@ class Token extends \yii\db\ActiveRecord
             $android_push_body = array(
                 'to' => $android_token,
                 'data' => array(
-                    'body' => $payload_text
+                    'body' => array(
+                        'text' => $payload_text,
+                        'q_id' => intval($quote_id),
                     )
+                )
             );
             $android_push_body = json_encode($android_push_body, JSON_UNESCAPED_UNICODE);
             $ch = curl_init('https://fcm.googleapis.com/fcm/send');
