@@ -160,6 +160,7 @@ class ApiController extends Controller
                 'name' => $book->name,
                 'description' => $book->description,
                 'author' => $book->readerAuthor->name,
+                'file_src' => $book->file_src,
             ]);
         }
         return json_encode($books_arr, JSON_UNESCAPED_UNICODE);
@@ -170,6 +171,7 @@ class ApiController extends Controller
         if (!is_file("$book->file_src")) {
             throw new \yii\web\NotFoundHttpException('The file does not exists.');
         }
+        // file_put_contents('test.txt', 'accessed//', FILE_APPEND);
         return Yii::$app->response->sendFile("$book->file_src", 'book.epub');
         // return var_dump($book);
 
