@@ -42,6 +42,7 @@ AppAsset::register($this);
             ['label' => 'Книги', 'url' => ['/site/list', 'type' => 'books']],
             ['label' => 'Цитаты', 'url' => ['/site/quotes']],
             ['label' => 'Читалка', 'url' => ['/reader/index']],
+            ['label' => 'Аудиокниги', 'url' => ['/audio/index']],
             Yii::$app->user->isGuest ? (
                 ['label' => 'Войти', 'url' => ['/site/login']]
             ) : (

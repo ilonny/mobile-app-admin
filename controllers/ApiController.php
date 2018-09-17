@@ -176,4 +176,7 @@ class ApiController extends Controller
         // return var_dump($book);
 
     }
+    public function actionDebugData($debug_data){
+        file_put_contents('debug.txt', $debug_data, FILE_APPEND);
+    }
 }
