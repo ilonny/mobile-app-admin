@@ -6,7 +6,7 @@ use Yii;
 use yii\helpers\Json;
 use yii\web\Controller;
 use app\models\AudioAuthor;
-use app\models\ReaderBook;
+use app\models\AudioBook;
 use app\models\UploadForm;
 use yii\web\UploadedFile;
 
@@ -35,33 +35,24 @@ class AudioController extends Controller
 
     public function actionBooks(){
         //если были данные с формы на добавление, добавим элемент
-        $model = new ReaderBook();
-        $uploadModel = new UploadForm();
+        $model = new AudioBook;
         if (Yii::$app->request->isPost) {
-            $uploadModel->file = UploadedFile::getInstance($uploadModel, 'file');
-            if ($uploadModel->file && $uploadModel->validate() &&  $uploadModel->file->extension == 'epub') {
-                $fileName = 'uploads/' . $uploadModel->file->baseName . '_' . uniqid() . '.' . $uploadModel->file->extension;
-                if ($uploadModel->file->saveAs($fileName)) {
-                    $model->file_src = $fileName;
-                }
+            if ($model->load(Yii::$app->request->post())) {
+                $model->save();
+                return $this->redirect('/audio/books');
+                // return $this->refresh();
             }
-
-            if ($model->load(Yii::$app->request->post()) && $model->save()) {
-                return $this->redirect('/reader/books');
-            }
+        } else {
+            $books = AudioBook::find()->all();
+            return $this->render('books', [
+                'books' => $books
+            ]);
         }
-        $books = ReaderBook::find()->all();
-
-        return $this->render('books', [
-            'books' => $books,
-            'model' => $model,
-            'uploadModel' => $uploadModel,
-        ]);
     }
 
     public function actionEdit($id){
         //если были данные с формы на добавление, добавим элемент
-        $model = ReaderBook::findOne($id);
+        $model = AudioBook::findOne($id);
         $uploadModel = new UploadForm();
         if (Yii::$app->request->isPost) {
             $uploadModel->file = UploadedFile::getInstance($uploadModel, 'file');

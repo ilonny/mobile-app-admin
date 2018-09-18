@@ -10,6 +10,8 @@ use Yii;
  * @property int $id
  * @property string $name
  * @property string $description
+ *
+ * @property AudioBook[] $audioBooks
  */
 class AudioAuthor extends \yii\db\ActiveRecord
 {
@@ -43,5 +45,13 @@ class AudioAuthor extends \yii\db\ActiveRecord
             'name' => 'Name',
             'description' => 'Description',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getAudioBooks()
+    {
+        return $this->hasMany(AudioBook::className(), ['audio_author_id' => 'id']);
     }
 }
