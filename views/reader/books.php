@@ -58,6 +58,7 @@
                 <div id="add" class="tab-pane">
                     <?php
                         $form = ActiveForm::begin();
+                        $model = new ReaderBook;
                     ?>
                     <?= $form->field($model, 'name')->textInput()->label('Наименование'); ?>
                     <?//= $form->field($model, 'item_type_id')->textInput(['type' => 'hidden', 'value' => $type == 'author' ? '1' : '2'])->label(false); ?>

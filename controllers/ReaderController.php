@@ -54,7 +54,6 @@ class ReaderController extends Controller
 
         return $this->render('books', [
             'books' => $books,
-            'model' => $model,
             'uploadModel' => $uploadModel,
         ]);
     }
@@ -84,6 +83,18 @@ class ReaderController extends Controller
         ]);
     }
 
+    public function actionEditAuthor($id){
+        //если были данные с формы на добавление, добавим элемент
+        $model = ReaderAuthor::findOne($id);
+        if ($model->load(Yii::$app->request->post())){
+            $model->save();
+            $this->redirect("/reader/authors");
+        }
+        return $this->render('edit-author', [
+            'model' => $model,
+        ]);
+    }
+
     public function actionDelete($id){
         $model = ReaderBook::findOne($id);
         if ($model->delete()) {
@@ -91,4 +102,10 @@ class ReaderController extends Controller
         }
     }
 
+    public function actionDeleteAuthor($id){
+        $model = ReaderAuthor::findOne($id);
+        if ($model->delete()) {
+            return $this->redirect('/reader/authors');
+        }
+    }
 }

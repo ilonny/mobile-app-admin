@@ -24,13 +24,13 @@
                         <?php foreach ($authors as $model): ?>
                             <div class="list-group-item clearfix">
                                 <span><?= $model->name; ?></span>
-                                <?= Html::beginForm(['/site/delete', 'id' => $model->id], 'post'); ?>
+                                <?= Html::beginForm(['/reader/delete-author', 'id' => $model->id], 'post'); ?>
                                 <?= Html::submitButton(
                                         'удалить',
                                         ['class' => 'btn btn-danger pull-right']
                                 )?>
                                 <?= Html::endForm(); ?>
-                                <a href="<?= Url::to(['site/edit', 'id' => $model->id]) ?>" class="btn btn-primary pull-right">Редактировать</a>
+                                <a href="<?= Url::to(['reader/edit-author', 'id' => $model->id]) ?>" class="btn btn-primary pull-right">Редактировать</a>
                             </div>
                         <?php endforeach; ?>
                     <?php else: ?>
