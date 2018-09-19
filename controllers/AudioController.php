@@ -92,7 +92,7 @@ class AudioController extends Controller
     }
 
     public function actionRenderAudioList($book_id){
-        $audiofiles = Audiofile::find()->andWhere(['audio_book_id' => $book_id])->all();
+        $audiofiles = Audiofile::find()->andWhere(['audio_book_id' => $book_id])->orderBy('sort')->all();
         return $this->renderAjax('render-audio-list', [
             'audiofiles' => $audiofiles,
         ]);
@@ -100,5 +100,36 @@ class AudioController extends Controller
 
     public function actionRenderAudioModal(){
         return $this->renderAjax('audio-modal');
+    }
+
+    public function actionUploadAudio(){
+        $form_data = Yii::$app->request->post();
+        $file_src = 'uploads/audio/' . $_FILES['file']['name'];
+        // var_dump($file_src);die();
+        if (move_uploaded_file($_FILES['file']['tmp_name'], $file_src)){
+            $max_sort = Audiofile::find()->max('sort');
+            $model = new Audiofile;
+            $model->name = $form_data['name'];
+            $model->description = $form_data['description'];
+            $model->file_src = $file_src;
+            $model->audio_book_id = $form_data['book_id'];
+            $model->sort = $max_sort + 1;
+            if ($model->save()){
+                return json_encode(['status' => 200, 'message' => 'Успешно сохранено'], JSON_UNESCAPED_UNICODE);
+            }
+        }
+        return json_encode(['status' => 500, 'message' => "Возникла внутренняя ошибка сервера ${file_src}"], JSON_UNESCAPED_UNICODE);        
+    }
+
+    public function actionSaveSort(){
+        $form_data = Yii::$app->request->post();
+        $model = Audiofile::findOne($form_data['audio_id']);
+        $model->sort = $form_data['sort_val'];
+        if ($model->update()) return true;
+    }
+
+    public function actionDeleteAudio($audio_id){
+        $model = Audiofile::findOne($audio_id);
+        if ($model->delete()) return true;
     }
 }
