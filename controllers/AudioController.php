@@ -8,6 +8,7 @@ use yii\web\Controller;
 use app\models\AudioAuthor;
 use app\models\AudioBook;
 use app\models\UploadForm;
+use app\models\Audiofile;
 use yii\web\UploadedFile;
 
 
@@ -53,19 +54,9 @@ class AudioController extends Controller
     public function actionEdit($id){
         //если были данные с формы на добавление, добавим элемент
         $model = AudioBook::findOne($id);
-        $uploadModel = new UploadForm();
         if (Yii::$app->request->isPost) {
-            $uploadModel->file = UploadedFile::getInstance($uploadModel, 'file');
-            // var_dump($uploadModel);die();
-            if ($uploadModel->file /* && $uploadModel->validate()  &&  $uploadModel->file->extension == 'epub' */) {
-                $fileName = 'uploads/' . $uploadModel->file->baseName . '_' . uniqid() . '.' . $uploadModel->file->extension;
-                if ($uploadModel->file->saveAs($fileName)) {
-                    $model->file_src = $fileName;
-                }
-            }
-
             if ($model->load(Yii::$app->request->post()) && $model->save()) {
-                return $this->redirect('/reader/books');
+                return $this->redirect('/audio/books');
             }
         }
         return $this->render('edit', [
@@ -98,5 +89,16 @@ class AudioController extends Controller
         if ($model->delete()) {
             return $this->redirect('/audio/authors');
         }
+    }
+
+    public function actionRenderAudioList($book_id){
+        $audiofiles = Audiofile::find()->andWhere(['audio_book_id' => $book_id])->all();
+        return $this->renderAjax('render-audio-list', [
+            'audiofiles' => $audiofiles,
+        ]);
+    }
+
+    public function actionRenderAudioModal(){
+        return $this->renderAjax('audio-modal');
     }
 }
