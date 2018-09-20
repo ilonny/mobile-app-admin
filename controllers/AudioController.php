@@ -52,6 +52,7 @@ class AudioController extends Controller
     }
 
     public function actionEdit($id){
+        // phpinfo();
         //если были данные с формы на добавление, добавим элемент
         $model = AudioBook::findOne($id);
         if (Yii::$app->request->isPost) {
@@ -103,8 +104,14 @@ class AudioController extends Controller
     }
 
     public function actionUploadAudio(){
+        set_time_limit(300);
+        ini_set('max_execution_time', 300);
+        ini_set('post_max_size', "100M");
         $form_data = Yii::$app->request->post();
+        // var_dump($_FILES);die();
         $file_src = 'uploads/audio/' . $_FILES['file']['name'];
+        $file_src = explode('.', $file_src);
+        $file_src = $file_src[0].'_'.time().'.'.$file_src[1];
         // var_dump($file_src);die();
         if (move_uploaded_file($_FILES['file']['tmp_name'], $file_src)){
             $max_sort = Audiofile::find()->max('sort');
