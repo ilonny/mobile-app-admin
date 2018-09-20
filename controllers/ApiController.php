@@ -14,6 +14,9 @@ use app\models\Quote;
 use app\models\UploadForm;
 use app\models\Token;
 use app\models\ReaderBook;
+use app\models\AudioAuthor;
+use app\models\AudioBook;
+use app\models\Audiofile;
 use yii\web\UploadedFile;
 use yii\helpers\Json;
 
@@ -178,5 +181,47 @@ class ApiController extends Controller
     }
     public function actionDebugData($debug_data){
         file_put_contents('debug.txt', $debug_data, FILE_APPEND);
+    }
+
+    public function actionGetAudioBooks(){
+        $books = AudioBook::find()->all();
+        $books_arr = [];
+        foreach ($books as $book){
+            array_push($books_arr, [
+                'id' => $book->id,
+                'name' => $book->name,
+                'description' => $book->description,
+                'author' => $book->audioAuthor->name,
+            ]);
+        }
+        return json_encode($books_arr, JSON_UNESCAPED_UNICODE);
+    }
+
+    public function actionGetAudioFiles($book_id){
+        $books = Audiofile::find()->andWhere(['audio_book_id' => $book_id])->orderBy('sort')->all();
+        $books_arr = [];
+        foreach ($books as $book){
+            array_push($books_arr, [
+                'id' => $book->id,
+                'name' => $book->name,
+                'description' => $book->description,
+                'file_src' => $book->file_src,
+            ]);
+        }
+        return json_encode($books_arr, JSON_UNESCAPED_UNICODE);
+    }
+
+    public function actionGetAudioFile($id){
+        $book = Audiofile::findOne($id);
+        // var_dump($book);die();
+        $filename = explode('/', $book->file_src);
+        $filename = $filename[2];
+        if (!is_file("$book->file_src")) {
+            throw new \yii\web\NotFoundHttpException('The file does not exists.');
+        }
+        // file_put_contents('test.txt', 'accessed//', FILE_APPEND);
+        return Yii::$app->response->sendFile("$book->file_src", $filename);
+        // return var_dump($book);
+
     }
 }
