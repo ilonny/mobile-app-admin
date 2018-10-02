@@ -9,6 +9,7 @@ use app\models\AudioAuthor;
 use app\models\AudioBook;
 use app\models\UploadForm;
 use app\models\Audiofile;
+use app\models\Toc;
 use yii\web\UploadedFile;
 
 
@@ -138,5 +139,16 @@ class AudioController extends Controller
     public function actionDeleteAudio($audio_id){
         $model = Audiofile::findOne($audio_id);
         if ($model->delete()) return true;
+    }
+
+    public function actionGetAudiofiles($audioBookId, $toc){
+        $audioBook = AudioBook::findOne($audioBookId);
+        $toc = Toc::findOne($toc);
+        $audiofiles = $audioBook->audiofiles;
+        return $this->renderAjax('render-audio-select', [
+            'audiofiles' => $audiofiles,
+            'audioBook' => $audioBook,
+            'toc' => $toc,
+        ]);
     }
 }

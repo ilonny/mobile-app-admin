@@ -15,6 +15,7 @@ use Yii;
  * @property string $other
  *
  * @property ReaderAuthor $readerAuthor
+ * @property Toc[] $tocs
  */
 class ReaderBook extends \yii\db\ActiveRecord
 {
@@ -60,5 +61,13 @@ class ReaderBook extends \yii\db\ActiveRecord
     public function getReaderAuthor()
     {
         return $this->hasOne(ReaderAuthor::className(), ['id' => 'reader_author_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getTocs()
+    {
+        return $this->hasMany(Toc::className(), ['book_id' => 'id']);
     }
 }

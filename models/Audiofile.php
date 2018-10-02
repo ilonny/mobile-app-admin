@@ -14,6 +14,8 @@ use Yii;
  * @property int $audio_book_id
  * @property string $other
  * @property int $sort
+ * @property int $reader_book_id
+ * @property int $toc_id
  *
  * @property AudioBook $audioBook
  */
@@ -35,7 +37,7 @@ class Audiofile extends \yii\db\ActiveRecord
         return [
             [['name', 'file_src', 'audio_book_id'], 'required'],
             [['description', 'file_src', 'other'], 'string'],
-            [['audio_book_id', 'sort'], 'integer'],
+            [['audio_book_id', 'sort', 'reader_book_id', 'toc_id'], 'integer'],
             [['name'], 'string', 'max' => 255],
             [['audio_book_id'], 'exist', 'skipOnError' => true, 'targetClass' => AudioBook::className(), 'targetAttribute' => ['audio_book_id' => 'id']],
         ];
@@ -54,6 +56,8 @@ class Audiofile extends \yii\db\ActiveRecord
             'audio_book_id' => 'Audio Book ID',
             'other' => 'Other',
             'sort' => 'Sort',
+            'reader_book_id' => 'Reader Book ID',
+            'toc_id' => 'Toc ID',
         ];
     }
 

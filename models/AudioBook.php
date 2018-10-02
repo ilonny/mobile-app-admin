@@ -15,6 +15,7 @@ use Yii;
  * @property string $other
  *
  * @property AudioAuthor $audioAuthor
+ * @property Audiofile[] $audiofiles
  */
 class AudioBook extends \yii\db\ActiveRecord
 {
@@ -60,5 +61,13 @@ class AudioBook extends \yii\db\ActiveRecord
     public function getAudioAuthor()
     {
         return $this->hasOne(AudioAuthor::className(), ['id' => 'audio_author_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getAudiofiles()
+    {
+        return $this->hasMany(Audiofile::className(), ['audio_book_id' => 'id']);
     }
 }

@@ -17,6 +17,7 @@ use app\models\ReaderBook;
 use app\models\AudioAuthor;
 use app\models\AudioBook;
 use app\models\Audiofile;
+use app\models\Toc;
 use yii\web\UploadedFile;
 use yii\helpers\Json;
 
@@ -179,6 +180,11 @@ class ApiController extends Controller
         // return var_dump($book);
 
     }
+
+    public function actionGetTocs($book_id){
+
+    }
+    
     public function actionDebugData($debug_data){
         file_put_contents('debug.txt', $debug_data, FILE_APPEND);
     }
@@ -222,6 +228,39 @@ class ApiController extends Controller
         // file_put_contents('test.txt', 'accessed//', FILE_APPEND);
         return Yii::$app->response->sendFile("$book->file_src", $filename);
         // return var_dump($book);
+    }
 
+    public function actionSetTocRelations($audiofile_id, $toc_id, $audio_book_id){
+        $toc = Toc::findOne($toc_id);
+        $reader_book = ReaderBook::find()->andWhere(['id' => $toc->book_id])->one();
+        $reader_book_id = $reader_book->id;
+        //если пришло обнуление, возьмем старый аудиофайл
+        if ($audiofile_id == '0'){
+            var_dump($toc->audiofile_id);
+            $audiofile = Audiofile::findOne($toc->audiofile_id);
+        }
+        var_dump($audiofile);
+        // var_dump($audiofile_id);
+        // var_dump($toc_id);
+        // var_dump($audio_book_id);
+        // var_dump($reader_book_id);
+        //действия для toc
+        //если глава аудиокниги не указана - проставить null для toc
+        if ($audiofile_id != '0'){
+            $toc->audio_book_id = intval($audio_book_id);
+            $toc->audiofile_id = intval($audiofile_id);
+            if (!$audiofile){
+                $audiofile = Audiofile::findOne($audiofile_id);
+            }
+            $audiofile->reader_book_id = intval($reader_book_id);
+            $audiofile->toc_id = intval($toc_id);
+        } else {
+            $toc->audio_book_id = null;
+            $toc->audiofile_id = null;
+            $audiofile->reader_book_id = null;
+            $audiofile->toc_id = null;
+        }
+        $toc->update();
+        $audiofile->update();
     }
 }
