@@ -48,7 +48,6 @@ class ReaderController extends Controller
                 }
             }
             if ($model->load(Yii::$app->request->post()) && $model->save()) {
-                // return $this->redirect('/reader/books');
                 //copy epub to zip and unzi p it for get tocs of book
                 $fileName = explode('.', $fileName);
                 copy($fileName[0].'.epub', $fileName[0].'.zip');
@@ -56,7 +55,14 @@ class ReaderController extends Controller
                 $zip->open($fileName[0].'.zip');
                 $zip->extractTo($fileName[0]);
                 $zip->close();
-                $xml = simplexml_load_file($fileName[0].'/toc.ncx');
+                $files=\yii\helpers\FileHelper::findFiles($fileName[0]);
+                foreach ($files as $file_path){
+                    $file_path_arr = explode('/', $file_path);
+                    if ($file_path_arr[count($file_path_arr)-1] == 'toc.ncx'){
+                        $toc_path = $file_path;
+                    }
+                }
+                $xml = simplexml_load_file($toc_path);
                 foreach ($xml->{"navMap"}->{"navPoint"} as $toc){
                     $toc_model = new Toc();
                     $toc_model->app_href = $toc->content['src']->__toString();
@@ -64,6 +70,7 @@ class ReaderController extends Controller
                     $toc_model->book_id = $model->id;
                     $toc_model->save();
                 }
+                return $this->redirect("/reader/edit?id={$model->id}");
             }
         }
         $books = ReaderBook::find()->all();

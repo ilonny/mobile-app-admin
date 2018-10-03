@@ -182,9 +182,21 @@ class ApiController extends Controller
     }
 
     public function actionGetTocs($book_id){
-
+        $models = Toc::find()->andWhere(['book_id' => $book_id])->all();
+        $arr = [];
+        foreach ($models as $model){
+            array_push($arr, [
+                'id' => $model->id,
+                'app_href' => $model->app_href,
+                'title' => $model->title,
+                'book_id' => $model->book_id,
+                'audio_book_id' => $model->audio_book_id,
+                'audiofile_id' => $model->audiofile_id,
+            ]);
+        }
+        return json_encode($arr, JSON_UNESCAPED_UNICODE);
     }
-    
+
     public function actionDebugData($debug_data){
         file_put_contents('debug.txt', $debug_data, FILE_APPEND);
     }
@@ -212,6 +224,8 @@ class ApiController extends Controller
                 'name' => $book->name,
                 'description' => $book->description,
                 'file_src' => $book->file_src,
+                'reader_book_id' => $book->reader_book_id,
+                'toc_id' => $book->toc_id,
             ]);
         }
         return json_encode($books_arr, JSON_UNESCAPED_UNICODE);
@@ -247,6 +261,13 @@ class ApiController extends Controller
         //действия для toc
         //если глава аудиокниги не указана - проставить null для toc
         if ($audiofile_id != '0'){
+            //если раньше уже был указан аудиофайл и он меняется, то у старого нужно удалить связь.
+            if ($toc->audiofile_id){
+                $old_audiofile = Audiofile::findOne($toc->audiofile_id);
+                $old_audiofile->reader_book_id = null;
+                $old_audiofile->toc_id = null;                
+                $old_audiofile->update();
+            }
             $toc->audio_book_id = intval($audio_book_id);
             $toc->audiofile_id = intval($audiofile_id);
             if (!$audiofile){
