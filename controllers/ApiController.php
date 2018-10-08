@@ -185,12 +185,18 @@ class ApiController extends Controller
         $models = Toc::find()->andWhere(['book_id' => $book_id])->all();
         $arr = [];
         foreach ($models as $model){
+            $audio_book_name = "";
+            if ($model->audio_book_id){
+                $audioBook = AudioBook::findOne($model->audio_book_id);
+                $audio_book_name = $audioBook->name;
+            }
             array_push($arr, [
                 'id' => $model->id,
                 'app_href' => $model->app_href,
                 'title' => $model->title,
                 'book_id' => $model->book_id,
                 'audio_book_id' => $model->audio_book_id,
+                'audio_book_name' => $audio_book_name,
                 'audiofile_id' => $model->audiofile_id,
             ]);
         }
@@ -219,6 +225,18 @@ class ApiController extends Controller
         $books = Audiofile::find()->andWhere(['audio_book_id' => $book_id])->orderBy('sort')->all();
         $books_arr = [];
         foreach ($books as $book){
+            $toc_href = "";
+            $reader_book_name = "";
+            $reader_book_src = "";
+            if ($book->toc_id){
+                $toc = Toc::findOne($book->toc_id);
+                $toc_href = $toc->app_href;
+            }
+            if ($book->reader_book_id){
+                $reader_book = ReaderBook::findOne($book->reader_book_id);
+                $reader_book_name = $reader_book->name;
+                $reader_book_src = $reader_book->file_src;
+            }
             array_push($books_arr, [
                 'id' => $book->id,
                 'name' => $book->name,
@@ -226,6 +244,9 @@ class ApiController extends Controller
                 'file_src' => $book->file_src,
                 'reader_book_id' => $book->reader_book_id,
                 'toc_id' => $book->toc_id,
+                'toc_href' => $toc_href,
+                'reader_book_name' => $reader_book_name,
+                'reader_book_src' => $reader_book_src,
             ]);
         }
         return json_encode($books_arr, JSON_UNESCAPED_UNICODE);
