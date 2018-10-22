@@ -119,6 +119,33 @@ class Token extends \yii\db\ActiveRecord
             // return $success;
     }
 
+    public function sendPushForGroupWithAction($payload_text){
+        $models = Token::find()->all();
+        $tokens_ios = [];
+        $tokens_android = [];
+        foreach ($models as $model){
+            $token_obj = json_decode($model->token);
+            if ($token_obj->os == 'ios'){
+                $tokens_ios[] = $model->other;
+            } else {
+                $tokens_android[] = $model->other;
+            }
+        }
+        $message = $payload_text;
+        $sound = 'default';
+        $development = false;
+        $payload = array();
+        $payload["need_alert"] = true;
+        $payload["aps"] = array('alert' => $message, 'sound' => $sound);
+        $payload = json_encode($payload, JSON_UNESCAPED_UNICODE);
+        $device_tokens = $tokens_ios;
+        foreach($device_tokens as $device) {
+            $curl_query = "curl -d '${payload}' --cert /var/www/flames_user/data/www/mobile-app.flamesclient.ru/web/apns-prod.pem:Rh3xwaex9g -H \"apns-topic: org.reactjs.native.example.GuruOnline\" --http2  https://api.push.apple.com/3/device/${device}";
+            shell_exec($curl_query);
+            var_dump($curl_query);die();
+        }
+    }
+
     public function sendPushForGroupAndroid($setting, $payload_text, $quote_id = null, $quote_title = null){
         $models = Token::find()
         ->where([
@@ -147,6 +174,46 @@ class Token extends \yii\db\ActiveRecord
                     'body' => array(
                         'text' => $payload_text,
                         'q_id' => intval($quote_id),
+                    ),
+                    'title' => $quote_title
+                )
+            );
+            $android_push_body = json_encode($android_push_body, JSON_UNESCAPED_UNICODE);
+            $ch = curl_init('https://fcm.googleapis.com/fcm/send');
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $android_push_body);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+                'Content-Type: application/json',
+                'Authorization: key=AAAAmLg0GRc:APA91bGaOgw6-8zB6Q_o7A-Qf5BU7ofEQqM5UoMAgIySYgcFQ3aS1z9V9W-Wk9Xa9qRrqaQ47qfo7tzAi4uY-4IzgAPpesbwVOYZQ4QX94VFCQvGLpSS4qaOwJpritlwf-n7BWsvH5jO9sKZAyA56vdcL1Gt1mlKtg'
+            ));
+            $response = curl_exec($ch);
+        }
+        // var_dump($response);
+        file_put_contents('debug.txt', json_encode($response), FILE_APPEND);
+    }
+
+    public function sendPushForGroupAndroidWithAction($payload_text){
+        $models = Token::find()
+        ->all();
+        $tokens_ios = [];
+        $tokens_android = [];
+        foreach ($models as $model){
+            $token_obj = json_decode($model->token);
+            if ($token_obj->os == 'ios'){
+                $tokens_ios[] = $model->other;
+            } else {
+                $tokens_android[] = $model->other;
+            }
+        }
+
+        foreach ($tokens_android as $android_token){
+            $android_push_body = array(
+                'to' => $android_token,
+                'data' => array(
+                    'body' => array(
+                        'text' => $payload_text,
+                        'need_alert' => true
                     ),
                     'title' => $quote_title
                 )

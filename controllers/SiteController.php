@@ -210,8 +210,8 @@ class SiteController extends Controller
         $model = new Push;
         if ($model->load(Yii::$app->request->post())){
             if ($model->save()){
-                Token::sendPushForAllAndroid($model->payload);
-                Token::sendPushForAll($model->payload);
+                Token::sendPushForGroupAndroidWithAction($model->payload);
+                Token::sendPushForGroupWithAction($model->payload);
                 $this->redirect('/site/push');
             }
         }

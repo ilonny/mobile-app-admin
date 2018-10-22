@@ -159,12 +159,23 @@ class ApiController extends Controller
         $books = ReaderBook::find()->all();
         $books_arr = [];
         foreach ($books as $book){
+            $book_path = explode('.', $book->file_src);
+            $files=\yii\helpers\FileHelper::findFiles($book_path[0]);
+            $cover_src = "";
+            foreach ($files as $file){
+                $file_ext = explode('.', $file);
+                if ($file_ext[1] == 'jpg'){
+                    $cover_src = $file;
+                    break;
+                }
+            }
             array_push($books_arr, [
                 'id' => $book->id,
                 'name' => $book->name,
                 'description' => $book->description,
                 'author' => $book->readerAuthor->name,
                 'file_src' => $book->file_src,
+                'cover_src' => $cover_src
             ]);
         }
         return json_encode($books_arr, JSON_UNESCAPED_UNICODE);
