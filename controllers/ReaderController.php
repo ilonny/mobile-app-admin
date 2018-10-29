@@ -19,10 +19,16 @@ class ReaderController extends Controller
     public $enableCsrfValidation = false;
 
     public function actionIndex(){
+        if (Yii::$app->user->isGuest) {
+            Yii::$app->user->loginRequired();
+        }
         return $this->render('index');
     }
 
     public function actionAuthors(){
+        if (Yii::$app->user->isGuest) {
+            Yii::$app->user->loginRequired();
+        }
         //если были данные с формы на добавление, добавим элемент
         $model = new ReaderAuthor;
         if ($model->load(Yii::$app->request->post())){
@@ -36,6 +42,9 @@ class ReaderController extends Controller
     }
 
     public function actionBooks(){
+        if (Yii::$app->user->isGuest) {
+            Yii::$app->user->loginRequired();
+        }
         //если были данные с формы на добавление, добавим элемент
         $model = new ReaderBook();
         $uploadModel = new UploadForm();
@@ -81,6 +90,9 @@ class ReaderController extends Controller
     }
 
     public function actionEdit($id){
+        if (Yii::$app->user->isGuest) {
+            Yii::$app->user->loginRequired();
+        }
         //если были данные с формы на добавление, добавим элемент
         $model = ReaderBook::findOne($id);
         $uploadModel = new UploadForm();
@@ -107,6 +119,9 @@ class ReaderController extends Controller
     }
 
     public function actionEditAuthor($id){
+        if (Yii::$app->user->isGuest) {
+            Yii::$app->user->loginRequired();
+        }
         //если были данные с формы на добавление, добавим элемент
         $model = ReaderAuthor::findOne($id);
         if ($model->load(Yii::$app->request->post())){
@@ -119,6 +134,9 @@ class ReaderController extends Controller
     }
 
     public function actionDelete($id){
+        if (Yii::$app->user->isGuest) {
+            Yii::$app->user->loginRequired();
+        }
         $model = ReaderBook::findOne($id);
         if ($model->delete()) {
             return $this->redirect('/reader/books');
@@ -126,6 +144,9 @@ class ReaderController extends Controller
     }
 
     public function actionDeleteAuthor($id){
+        if (Yii::$app->user->isGuest) {
+            Yii::$app->user->loginRequired();
+        }
         $model = ReaderAuthor::findOne($id);
         if ($model->delete()) {
             return $this->redirect('/reader/authors');

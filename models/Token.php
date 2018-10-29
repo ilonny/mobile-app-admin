@@ -142,7 +142,6 @@ class Token extends \yii\db\ActiveRecord
         foreach($device_tokens as $device) {
             $curl_query = "curl -d '${payload}' --cert /var/www/flames_user/data/www/mobile-app.flamesclient.ru/web/apns-prod.pem:Rh3xwaex9g -H \"apns-topic: org.reactjs.native.example.GuruOnline\" --http2  https://api.push.apple.com/3/device/${device}";
             shell_exec($curl_query);
-            var_dump($curl_query);die();
         }
     }
 
