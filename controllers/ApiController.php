@@ -155,9 +155,13 @@ class ApiController extends Controller
         }
     }
 
-    public function actionGetReaderBooks(){
-        $books = ReaderBook::find()->all();
+    public function actionGetReaderBooks($offset = 0){
+        $count_books = count(ReaderBook::find()->all());
+        $books = ReaderBook::find()->limit(5)->offset(($offset-1) * 5)->all();
+        $page_count = ceil($count_books / 5);
         $books_arr = [];
+        $response = [];
+        $response['page_count'] = $page_count;
         foreach ($books as $book){
             $book_path = explode('.', $book->file_src);
             $files=\yii\helpers\FileHelper::findFiles($book_path[0]);
@@ -178,7 +182,8 @@ class ApiController extends Controller
                 'cover_src' => $cover_src
             ]);
         }
-        return json_encode($books_arr, JSON_UNESCAPED_UNICODE);
+        $response['books'] = $books_arr;
+        return json_encode($response, JSON_UNESCAPED_UNICODE);
     }
 
     public function actionGetReaderBook($id){
