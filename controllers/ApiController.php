@@ -89,6 +89,7 @@ class ApiController extends Controller
             $res[$key]['id'] = $model->id;
             $res[$key]['title'] = $model->title;
             $res[$key]['text_short'] = $model->text_short;
+            $res[$key]['text'] = $model->text;
             $res[$key]['author_name'] = $model->getAuthorName();
         }
         // return JSON::encode($res, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE);
