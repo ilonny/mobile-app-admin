@@ -189,12 +189,12 @@ class SiteController extends Controller
             $path = Yii::$app->params['uploadPath'] . $model->img_src;
             // var_dump($model->item_id);
             // die();
-            Token::sendPushForGroupAndroid($setting->id, $quote->text_short);
-            Token::sendPushForGroup($model->item_id, $model->text_short);
             if ($model->save()){
                 if ($image){
                     $image->saveAs($path);
                 }
+                // Token::sendPushForGroupAndroid($model->item_id, $model->text_short, $model->id, $model->title);
+                // Token::sendPushForGroup($model->item_id, $model->text_short, $model->id, $model->title);
                 //success saved file
                 $this->redirect('/site/quotes');
             }

@@ -19,10 +19,16 @@ class AudioController extends Controller
     public $enableCsrfValidation = false;
 
     public function actionIndex(){
+        if (Yii::$app->user->isGuest) {
+            Yii::$app->user->loginRequired();
+        }
         return $this->render('index');
     }
 
     public function actionAuthors(){
+        if (Yii::$app->user->isGuest) {
+            Yii::$app->user->loginRequired();
+        }
         //если были данные с формы на добавление, добавим элемент
         $model = new AudioAuthor;
         if ($model->load(Yii::$app->request->post())){
@@ -36,6 +42,9 @@ class AudioController extends Controller
     }
 
     public function actionBooks(){
+        if (Yii::$app->user->isGuest) {
+            Yii::$app->user->loginRequired();
+        }
         //если были данные с формы на добавление, добавим элемент
         $model = new AudioBook;
         if (Yii::$app->request->isPost) {
@@ -53,6 +62,9 @@ class AudioController extends Controller
     }
 
     public function actionEdit($id){
+        if (Yii::$app->user->isGuest) {
+            Yii::$app->user->loginRequired();
+        }
         // phpinfo();
         //если были данные с формы на добавление, добавим элемент
         $model = AudioBook::findOne($id);
@@ -68,6 +80,9 @@ class AudioController extends Controller
     }
 
     public function actionEditAuthor($id){
+        if (Yii::$app->user->isGuest) {
+            Yii::$app->user->loginRequired();
+        }
         //если были данные с формы на добавление, добавим элемент
         $model = AudioAuthor::findOne($id);
         if ($model->load(Yii::$app->request->post())){
@@ -80,6 +95,9 @@ class AudioController extends Controller
     }
 
     public function actionDelete($id){
+        if (Yii::$app->user->isGuest) {
+            Yii::$app->user->loginRequired();
+        }
         $model = AudioBook::findOne($id);
         if ($model->delete()) {
             return $this->redirect('/audio/books');
@@ -87,6 +105,9 @@ class AudioController extends Controller
     }
 
     public function actionDeleteAuthor($id){
+        if (Yii::$app->user->isGuest) {
+            Yii::$app->user->loginRequired();
+        }
         $model = AudioAuthor::findOne($id);
         if ($model->delete()) {
             return $this->redirect('/audio/authors');
@@ -94,6 +115,9 @@ class AudioController extends Controller
     }
 
     public function actionRenderAudioList($book_id){
+        if (Yii::$app->user->isGuest) {
+            Yii::$app->user->loginRequired();
+        }
         $audiofiles = Audiofile::find()->andWhere(['audio_book_id' => $book_id])->orderBy('sort')->all();
         return $this->renderAjax('render-audio-list', [
             'audiofiles' => $audiofiles,

@@ -156,13 +156,13 @@ class ApiController extends Controller
         }
     }
 
-    public function actionGetReaderBooks($offset = 0){
-        $count_books = count(ReaderBook::find()->all());
-        $books = ReaderBook::find()->limit(5)->offset(($offset-1) * 5)->all();
-        $page_count = ceil($count_books / 5);
-        $books_arr = [];
+    public function actionGetReaderBooks(){
+        // $count_books = count(ReaderBook::find()->all());
+        // $page_count = ceil($count_books / 5);
+        // $response['page_count'] = $page_count;
+        $books = ReaderBook::find()->all();
         $response = [];
-        $response['page_count'] = $page_count;
+        $books_arr = [];
         foreach ($books as $book){
             $book_path = explode('.', $book->file_src);
             $files=\yii\helpers\FileHelper::findFiles($book_path[0]);
@@ -171,6 +171,9 @@ class ApiController extends Controller
                 $file_ext = explode('.', $file);
                 if ($file_ext[1] == 'jpg'){
                     $cover_src = $file;
+                    // $imagedata = file_get_contents($file);
+                    // // alternatively specify an URL, if PHP settings allow
+                    // $base64 = base64_encode($imagedata);
                     break;
                 }
             }
@@ -180,7 +183,8 @@ class ApiController extends Controller
                 'description' => $book->description,
                 'author' => $book->readerAuthor->name,
                 'file_src' => $book->file_src,
-                'cover_src' => $cover_src
+                'cover_src' => $cover_src,
+                // 'base64' => $base64,
             ]);
         }
         $response['books'] = $books_arr;
@@ -228,11 +232,39 @@ class ApiController extends Controller
         $books = AudioBook::find()->all();
         $books_arr = [];
         foreach ($books as $book){
+            $audiofiles = Audiofile::find()->andWhere(['audio_book_id' => $book->id])->orderBy('sort')->all();
+            $audiofiles_arr = [];
+            foreach ($audiofiles as $audiofile){
+                $toc_href = "";
+                $reader_book_name = "";
+                $reader_book_src = "";
+                if ($audiofile->toc_id){
+                    $toc = Toc::findOne($audiofile->toc_id);
+                    $toc_href = $toc->app_href;
+                }
+                if ($audiofile->reader_book_id){
+                    $reader_book = ReaderBook::findOne($audiofile->reader_book_id);
+                    $reader_book_name = $reader_book->name;
+                    $reader_book_src = $reader_book->file_src;
+                }
+                array_push($audiofiles_arr, [
+                    'id' => $audiofile->id,
+                    'name' => $audiofile->name,
+                    'description' => $audiofile->description,
+                    'file_src' => $audiofile->file_src,
+                    'reader_book_id' => $audiofile->reader_book_id,
+                    'toc_id' => $audiofile->toc_id,
+                    'toc_href' => $toc_href,
+                    'reader_book_name' => $reader_book_name,
+                    'reader_book_src' => $reader_book_src,
+                ]);
+            }
             array_push($books_arr, [
                 'id' => $book->id,
                 'name' => $book->name,
                 'description' => $book->description,
                 'author' => $book->audioAuthor->name,
+                'audiofiles' => $audiofiles_arr
             ]);
         }
         return json_encode($books_arr, JSON_UNESCAPED_UNICODE);

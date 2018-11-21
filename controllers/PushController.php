@@ -114,20 +114,23 @@ class PushController extends Controller
             return $success;
         }
         
-        send_ios_push('ты пидор');
     }
     public function actionDailyPush(){
-        $settings = Item::find()->all();
-        foreach($settings as $setting){
-            //для каждого автора найдем список цитат
-            $quotes = Quote::find()->andWhere(['item_id' => $setting->id])->all();
-            //возьмем из них рандомную
-            $rand_id = rand(0, count($quotes)-1);
-            $quote = $quotes[$rand_id];
-            if ($quote->text_short){
-                Token::sendPushForGroupAndroid($setting->id, $quote->text_short, $quote->id, $quote->title);
-                Token::sendPushForGroup($setting->id, $quote->text_short, $quote->id);
-            }
-        }
+        set_time_limit(600);
+        file_put_contents('log.txt', $_SERVER['REMOTE_ADDR'].' '.time().'/n', FILE_APPEND);
+        // if ($_SERVER['REMOTE_ADDR'] == '194.58.111.232' || $_GET['qq'] == '655535'){
+        //     $settings = Item::find()->all();
+        //     foreach($settings as $setting){
+        //         //для каждого автора найдем список цитат
+        //         $quotes = Quote::find()->andWhere(['item_id' => $setting->id])->all();
+        //         //возьмем из них рандомную
+        //         $rand_id = rand(0, count($quotes)-1);
+        //         $quote = $quotes[$rand_id];
+        //         if ($quote->text_short){
+        //             Token::sendPushForGroupAndroid($setting->id, $quote->text_short, $quote->id, $quote->title);
+        //             Token::sendPushForGroup($setting->id, $quote->text_short, $quote->id);
+        //         }
+        //     }
+        // }
     }
 }
