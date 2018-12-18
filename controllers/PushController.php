@@ -115,22 +115,127 @@ class PushController extends Controller
         }
         
     }
-    public function actionDailyPush(){
-        set_time_limit(600);
+    public function actionDailyPush($offset = 0){
+        set_time_limit(1200);
+        ini_set("max_execution_time", "1200");
         file_put_contents('log.txt', $_SERVER['REMOTE_ADDR'].' '.time().'/n', FILE_APPEND);
-        // if ($_SERVER['REMOTE_ADDR'] == '194.58.111.232' || $_GET['qq'] == '655535'){
-        //     $settings = Item::find()->all();
-        //     foreach($settings as $setting){
-        //         //для каждого автора найдем список цитат
-        //         $quotes = Quote::find()->andWhere(['item_id' => $setting->id])->all();
-        //         //возьмем из них рандомную
-        //         $rand_id = rand(0, count($quotes)-1);
-        //         $quote = $quotes[$rand_id];
-        //         if ($quote->text_short){
-        //             Token::sendPushForGroupAndroid($setting->id, $quote->text_short, $quote->id, $quote->title);
-        //             Token::sendPushForGroup($setting->id, $quote->text_short, $quote->id);
-        //         }
-        //     }
-        // }
+        if ($_SERVER['REMOTE_ADDR'] == '194.58.111.232' || $_GET['qq'] == '655535'){
+            //сформируем массив из рандомных цитат которые мы будем отправлять
+            $settings = Item::find()->all();
+            $random_quotes = [];
+            foreach($settings as $setting){
+                //для каждого автора найдем список цитат
+                $quotes = Quote::find()->andWhere(['item_id' => $setting->id])->all();
+                //возьмем из них рандомную
+                $rand_id = rand(0, count($quotes)-1);
+                if ($quotes[$rand_id]->text_short){
+                    $random_quotes[] = $quotes[$rand_id];
+                }
+            }
+            //берем теперь все токены и прогоням их. отправляя пуш цитаты, если токен подписан на источник этой цитаты
+            if ($offset == 0) {
+                $tokens = Token::find()->limit(10)->all();
+            } else {
+                $tokens = Token::find()->offset($offset)->limit(10)->all();
+            }
+            foreach ($tokens as $token){
+                //удалим кривые токены
+                    //пока не воркает нормально
+                    if (!$token->other){
+                        $token->delete();
+                        continue;
+                    }
+                //
+                //определимся ios или андроид
+                if (json_decode($token->token)->os == 'ios'){
+                    $token_platform = 'ios';
+                } else {
+                    $token_platform = 'android';
+                }
+                //для каждой цитаты определимся есть ли подписка? если есть - отправим пуш 
+                foreach ($random_quotes as $key => $quote){
+                    $need_to_push = false;
+                    if ($token->settings == 'all'){
+                        $need_to_push = true;
+                    } else {
+                        $settings = json_decode($token->settings, true);
+                        if (in_array($quote->item_id, $settings)){
+                            $need_to_push = true;
+                        }
+                    }
+                    //если есть подписка на такой вид цитат, отправим пуш.
+                    if ($need_to_push){
+                        //тут пойдет разделение на платформы
+                        if ($token_platform == 'ios'){
+                            $payload = json_encode([
+                                "quote_id" => $quote->id,
+                                "aps" => [
+                                    "alert" => [
+                                        "title" => $quote->getAuthorName(),
+                                        // "subtitle" => $quote->title,
+                                        "body" => $quote->text_short
+                                    ],
+                                    "sound" => "default",
+                                ],
+                            ], JSON_UNESCAPED_UNICODE);
+                            $device = $token->other;
+                            $curl_query = "curl -d '${payload}' --cert /var/www/flames_user/data/www/mobile-app.flamesclient.ru/web/apns-prod.pem:Rh3xwaex9g -H \"apns-topic: org.reactjs.native.example.GuruOnline\" --http2  https://api.push.apple.com/3/device/${device}";
+                            $curl_result = shell_exec($curl_query);
+                            // var_dump($curl_query);
+                            // var_dump($curl_result);
+                            // die();
+                            if ($curl_result != NULL){
+                                $result_arr = json_decode($curl_result, true);
+                                // if ($result_arr['reason']){
+                                //     $token->delete();
+                                //     continue 2;
+                                //     //берем следующий токен 
+                                // }
+                            }
+                        } else {
+                            $android_push_body = json_encode([
+                                'to' => $token->other,
+                                'data' => array(
+                                    'body' => array(
+                                        'text' => $quote->text_short,
+                                        'q_id' => intval($quote->id),
+                                    ),
+                                    'title' => $quote->getAuthorName()
+                                )
+                            ], JSON_UNESCAPED_UNICODE);
+                            $ch = curl_init('https://fcm.googleapis.com/fcm/send');
+                            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+                            curl_setopt($ch, CURLOPT_POSTFIELDS, $android_push_body);
+                            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                            curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+                                'Content-Type: application/json',
+                                'Authorization: key=AAAAmLg0GRc:APA91bGaOgw6-8zB6Q_o7A-Qf5BU7ofEQqM5UoMAgIySYgcFQ3aS1z9V9W-Wk9Xa9qRrqaQ47qfo7tzAi4uY-4IzgAPpesbwVOYZQ4QX94VFCQvGLpSS4qaOwJpritlwf-n7BWsvH5jO9sKZAyA56vdcL1Gt1mlKtg'
+                            ));
+                            $response = curl_exec($ch);
+                            $response = json_decode($response, true);
+                            // if ($response['failure']){
+                            //     $token->delete();
+                            //     continue 2;
+                            // }
+                        }
+                    }
+                }
+            }
+            ////
+            //Старый дурацкий код
+            // $settings = Item::find()->all();
+            // foreach($settings as $setting){
+            //     //для каждого автора найдем список цитат
+            //     $quotes = Quote::find()->andWhere(['item_id' => $setting->id])->all();
+            //     //возьмем из них рандомную
+            //     $rand_id = rand(0, count($quotes)-1);
+            //     $quote = $quotes[$rand_id];
+            //     if ($quote->text_short){
+            //         Token::sendPushForGroupAndroid($setting->id, $quote->text_short, $quote->id, $quote->title);
+            //         Token::sendPushForGroup($setting->id, $quote->text_short, $quote->id);
+            //     }
+            // }
+            // конец старый дурацкий код
+        }
     }
 }

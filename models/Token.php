@@ -46,7 +46,7 @@ class Token extends \yii\db\ActiveRecord
         ];
     }
 
-    public function sendPushForGroup($setting, $payload_text, $quote_id = null){
+    public function sendPushForGroup($setting, $payload_text, $quote_id = null, $quote_title = null){
         $models = Token::find()
         ->where([
             'or',
@@ -74,49 +74,11 @@ class Token extends \yii\db\ActiveRecord
             $payload["quote_id"] = $quote_id;
             $payload["aps"] = array('alert' => $message, 'sound' => $sound);
             $payload = json_encode($payload, JSON_UNESCAPED_UNICODE);
-            // $payload = preg_replace_callback('/\\\\u([0-9a-f]{4})/i', 'replace_unicode_escape_sequence', $payload);
-            // $apns_url = NULL;
-            // $apns_cert = NULL;
-            // $apns_port = 2195;
-
-            // if($development) {
-            //     $apns_url = 'gateway.sandbox.push.apple.com';
-            //     $apns_cert = 'apns-dev.pem';
-            // } else {
-            //     $apns_url = 'gateway.push.apple.com';
-            //     $apns_cert = 'apns-prod.pem';
-            // }
-
-            // if (!file_exists($apns_cert))
-            // // echo("cert file exists\n");
-            // // else
-            // echo("cert file not exists\n");;
-            // $success = 0;
-            // $stream_context = stream_context_create();
-            // stream_context_set_option($stream_context, 'ssl', 'local_cert', $apns_cert);
-            // stream_context_set_option($stream_context, 'ssl', 'passphrase', 'Rh3xwaex9g');
-
-            // $apns = stream_socket_client('ssl://' . $apns_url . ':' . $apns_port, $error, $error_string, 2, STREAM_CLIENT_CONNECT, $stream_context);
-
             $device_tokens = $tokens_ios;
-
             foreach($device_tokens as $device) {
                 $curl_query = "curl -d '${payload}' --cert /var/www/flames_user/data/www/mobile-app.flamesclient.ru/web/apns-prod.pem:Rh3xwaex9g -H \"apns-topic: org.reactjs.native.example.GuruOnline\" --http2  https://api.push.apple.com/3/device/${device}";
                 shell_exec($curl_query);
-                // $apns_message = chr(0) . chr(0) . chr(32) . pack('H*', str_replace(' ', '', $device)) . chr(0) . chr(strlen($payload)) . $payload;
-                // // var_dump($apns_message);die();
-                // if (fwrite($apns, $apns_message)) {
-                //     $success++;
-                //     // echo("sent\n");
-                // } else {
-                //     echo("failed \n");
-                // }
-
             }
-            // echo("fetch done\n");
-            // socket_close($apns);
-            // fclose($apns);
-            // return $success;
     }
 
     public function sendPushForGroupWithAction($payload_text){
