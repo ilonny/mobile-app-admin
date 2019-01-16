@@ -123,7 +123,7 @@ class ApiController extends Controller
         ]);
     }
 
-    public function actionSetToken($token, $settings){
+    public function actionSetToken($token, $settings, $news_settings = 'old', $version = '2'){
         //safe or update
         $token_clear = json_decode($token);
         $token_clear = $token_clear->token;
@@ -139,7 +139,9 @@ class ApiController extends Controller
         if (!$model){
             $model = new Token();
             $model->token = $token;
-            $model->settings = $settings;
+            $model->settings = $settings == 'old' ? $model->settings : $settings;
+            $model->news_settings = $news_settings == 'old' ? $model->news_settings : $news_settings;
+            $model->version = $version;
             $model->other = $token_clear;
             if ($model->save()){
                 return 'success';
@@ -147,7 +149,9 @@ class ApiController extends Controller
                 return 'error';
             }
         } else {
-            $model->settings = $settings;
+            $model->settings = $settings == 'old' ? $model->settings : $settings;
+            $model->news_settings = $news_settings == 'old' ? $model->news_settings : $news_settings;
+            $model->version = $version;
             if ($model->update()){
                 return 'success';
             } else {

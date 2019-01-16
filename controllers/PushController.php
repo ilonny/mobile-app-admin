@@ -15,7 +15,7 @@ use app\models\UploadForm;
 use app\models\Token;
 use yii\web\UploadedFile;
 use yii\helpers\Json;
-
+use app\models\BitrixPushLogs;
 
 class PushController extends Controller
 {
@@ -135,6 +135,7 @@ class PushController extends Controller
             //берем теперь все токены и прогоням их. отправляя пуш цитаты, если токен подписан на источник этой цитаты
             if ($offset == 0) {
                 $tokens = Token::find()->limit(10)->all();
+                // $tokens = Token::find()->where(['>=', 'id', 269])->limit(10)->all();
             } else {
                 $tokens = Token::find()->offset($offset)->limit(10)->all();
             }
@@ -238,4 +239,102 @@ class PushController extends Controller
             // конец старый дурацкий код
         }
     }
+
+    public function actionBitrixPush(){
+        //
+        $types = ['content', 'read', 'look', 'listen', 'important'];
+        foreach ($types as $key => $type) :
+            $api_arr = shell_exec("curl -X GET https://harekrishna.ru/mobile-api/get-list.php?type=${type}");
+            $last_item = json_decode($api_arr, true);
+            $last_item = $last_item[0];
+            $existed_model = BitrixPushLogs::find()->where(['site_id' => $last_item['ID']])->all();
+            if (!$existed_model):
+                $model = new BitrixPushLogs();
+                $model->type = $type;
+                $model->site_id = $last_item['ID'];
+                $model->news_title = $last_item['NAME'];
+                $model->save();
+                // var_dump("curl -X GET https://harekrishna.ru/mobile-api/get-list.php?type=${type}");die();
+                // var_dump('existing');die();
+                //
+                // $s1 = urldecode($_GET['data']);
+                // $data = json_decode($s1, true);
+                $data = $last_item;
+                $data['PREVIEW_TEXT'] = str_replace("&nbsp;", " ", $data['PREVIEW_TEXT']);
+                file_put_contents('bitrix_push.txt', print_r($data, true), FILE_APPEND);
+                // var_dump($data['PREVIEW_TEXT']);die();
+                // var_dump($_GET);
+                // echo 123;
+                $tokens = Token::find()->where(['version' => '2'])->all();
+                // var_dump($tokens);die();
+                // $token = Token::find()->where(['id' => 255])->one();
+                foreach ($tokens as $key => $token) {
+                    $need_push = true;
+                    $site_settings_arr = json_decode($token->news_settings, true);
+                    switch ($type) {
+                        case 'look':
+                            if (!in_array('look', $site_settings_arr)) $need_push = false;
+                            $title = "Новое в разделе  \"Смотреть\"";
+                            break;
+                        case 'content':
+                            if (!in_array('content', $site_settings_arr)) $need_push = false;    
+                            $title = "Новое в разделе  \"Новости\"";
+                            break;
+                        case 'listen':
+                            if (!in_array('listen', $site_settings_arr)) $need_push = false;    
+                            $title = "Новое в разделе  \"Слушать\"";
+                            break;
+                        case 'read':
+                            if (!in_array('read', $site_settings_arr)) $need_push = false;    
+                            $title = "Новое в разделе  \"Читать\"";
+                            break;
+                        case 'important':
+                            if (!in_array('important', $site_settings_arr)) $need_push = false;    
+                            $title = "Новое в разделе  \"Это важно\"";
+                            break;
+                        default:
+                            # code...
+                            $need_push = false;
+                            break;
+                    }
+                    if ($need_push){
+                        if (json_decode($token->token)->os == 'ios'){
+                            $token_platform = 'ios';
+                        } else {
+                            $token_platform = 'android';
+                        }
+                        if ($token_platform == 'ios'){
+                            $payload = json_encode([
+                                "news_id" => $data['ID'],
+                                "news_title" => $data['NAME'],
+                                "aps" => [
+                                    "alert" => [
+                                        "title" => $title,
+                                        // "subtitle" => $quote->title,
+                                        "body" => $data['PREVIEW_TEXT'],
+                                    ],
+                                    "sound" => "default",
+                                ],
+                            ], JSON_UNESCAPED_UNICODE);
+                            // echo $payload; die();
+                            $device = $token->other;
+                            $curl_query = "curl -d '${payload}' --cert /var/www/flames_user/data/www/mobile-app.flamesclient.ru/web/apns-prod.pem:Rh3xwaex9g -H \"apns-topic: org.reactjs.native.example.GuruOnline\" --http2  https://api.push.apple.com/3/device/${device}";
+                            // $curl_query = "curl -d '${payload}' --cert /var/www/flames_user/data/www/mobile-app.flamesclient.ru/web/apns-dev.pem:Rh3xwaex9g -H \"apns-topic: org.reactjs.native.example.GuruOnline\" --http2  https://api.push.apple.com/3/device/${device}";
+                            $curl_result = shell_exec($curl_query);
+                            // var_dump($curl_result);
+                        }
+                    }
+                }
+                file_put_contents('bitrix_push.txt', 'start ', FILE_APPEND);
+                file_put_contents('bitrix_push.txt', print_r($data, true), FILE_APPEND);
+                file_put_contents('bitrix_push.txt', print_r($curl_query, true), FILE_APPEND);
+                file_put_contents('bitrix_push.txt', print_r($curl_result, true), FILE_APPEND);
+                file_put_contents('bitrix_push.txt', ' end ', FILE_APPEND);
+            endif;
+        endforeach;
+    }
+        // var_dump($token_platform);die();
+        
+
+        // $data = $_GET['data'];
 }

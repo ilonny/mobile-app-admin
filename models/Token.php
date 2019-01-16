@@ -29,7 +29,7 @@ class Token extends \yii\db\ActiveRecord
     {
         return [
             [['token', 'settings'], 'required'],
-            [['token', 'settings', 'other'], 'string'],
+            [['token', 'settings', 'other', 'version', 'news_settings'], 'string'],
         ];
     }
 
@@ -43,6 +43,8 @@ class Token extends \yii\db\ActiveRecord
             'token' => 'Token',
             'settings' => 'Settings',
             'other' => 'Other',
+            'version' => 'Vther',
+            'news_settings' => 'NewsSettings',
         ];
     }
 
