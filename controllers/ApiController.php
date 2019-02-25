@@ -123,7 +123,16 @@ class ApiController extends Controller
         ]);
     }
 
-    public function actionSetToken($token, $settings, $news_settings = 'old', $version = '2'){
+    public function actionSetToken($token, $settings, $news_settings = '["content","read","look","listen","important"]', $version = '1'){
+        if ($news_settings == 'news,read,look,listen,important' || $news_settings == "['news', 'read', 'look', 'listen', 'important']") {
+            $news_settings = '["content","read","look","listen","important"]';
+        }
+        if (!$news_settings){
+            $news_settings = '["content","read","look","listen","important"]';
+        }
+        // if ($news_settings == 'old'){
+        //     $news_settings = '["content","read","look","listen","important"]';
+        // }
         //safe or update
         $token_clear = json_decode($token);
         $token_clear = $token_clear->token;
@@ -136,11 +145,12 @@ class ApiController extends Controller
             $token = json_encode($token);
         }
         $model = Token::find()->where(['token' => $token])->one();
+        
         if (!$model){
             $model = new Token();
             $model->token = $token;
             $model->settings = $settings == 'old' ? $model->settings : $settings;
-            $model->news_settings = $news_settings == 'old' ? $model->news_settings : $news_settings;
+            $model->news_settings = $news_settings;
             $model->version = $version;
             $model->other = $token_clear;
             if ($model->save()){
@@ -150,8 +160,18 @@ class ApiController extends Controller
             }
         } else {
             $model->settings = $settings == 'old' ? $model->settings : $settings;
-            $model->news_settings = $news_settings == 'old' ? $model->news_settings : $news_settings;
+            if ($model->news_settings && $news_settings == 'old'){
+                $model->news_settings = $model->news_settings;
+                // var_dump($model->news_settings);
+                // die();
+            } else if (!$model->news_settings && $news_settings == 'old'){
+                $model->news_settings = '["content","read","look","listen","important"]';
+            } else {
+                $model->news_settings = $news_settings;
+            }
+            // $model->news_settings = $news_settings;
             $model->version = $version;
+            // var_dump($model);die();
             if ($model->update()){
                 return 'success';
             } else {

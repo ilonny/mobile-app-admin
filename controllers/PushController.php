@@ -242,7 +242,8 @@ class PushController extends Controller
 
     public function actionBitrixPush(){
         //
-        $types = ['content', 'read', 'look', 'listen', 'important'];
+        $types = ['content', 'read', 'look', 'listen', 'important', 'news'];
+        
         foreach ($types as $key => $type) :
             $api_arr = shell_exec("curl -X GET https://harekrishna.ru/mobile-api/get-list.php?type=${type}");
             $last_item = json_decode($api_arr, true);
@@ -267,17 +268,24 @@ class PushController extends Controller
                 // echo 123;
                 $tokens = Token::find()->where(['version' => '2'])->all();
                 // var_dump($tokens);die();
-                // $token = Token::find()->where(['id' => 255])->one();
+                // $tokens = Token::find()->where(['id' => 299])->all();
+                
                 foreach ($tokens as $key => $token) {
+                    
                     $need_push = true;
                     $site_settings_arr = json_decode($token->news_settings, true);
+                    
                     switch ($type) {
                         case 'look':
                             if (!in_array('look', $site_settings_arr)) $need_push = false;
                             $title = "Новое в разделе  \"Смотреть\"";
                             break;
                         case 'content':
-                            if (!in_array('content', $site_settings_arr)) $need_push = false;    
+                            if (!in_array('content', $site_settings_arr)) $need_push = false;
+                            $title = "Новое в разделе  \"Новости\"";
+                            break;
+                        case 'news':
+                            if (!in_array('news', $site_settings_arr)) $need_push = false;
                             $title = "Новое в разделе  \"Новости\"";
                             break;
                         case 'listen':
@@ -296,6 +304,9 @@ class PushController extends Controller
                             # code...
                             $need_push = false;
                             break;
+                    }
+                    if (!$data['ID'] || !$data['NAME'] || !$model->id){
+                        $need_push = false;
                     }
                     if ($need_push){
                         if (json_decode($token->token)->os == 'ios'){
@@ -322,6 +333,31 @@ class PushController extends Controller
                             // $curl_query = "curl -d '${payload}' --cert /var/www/flames_user/data/www/mobile-app.flamesclient.ru/web/apns-dev.pem:Rh3xwaex9g -H \"apns-topic: org.reactjs.native.example.GuruOnline\" --http2  https://api.push.apple.com/3/device/${device}";
                             $curl_result = shell_exec($curl_query);
                             // var_dump($curl_result);
+                        } else {
+                            $android_push_body = json_encode([
+                                'to' => $token->other,
+                                'data' => array(
+                                    'body' => array(
+                                        'text' => $data['PREVIEW_TEXT'],
+                                        'q_id' => 'false',
+                                        "news_id" => intval($data['ID']),
+                                        "news_title" => $data['NAME'],
+                                    ),
+                                    'title' => $title
+                                )
+                            ], JSON_UNESCAPED_UNICODE);
+                            // var_dump($android_push_body);die();
+                            $ch = curl_init('https://fcm.googleapis.com/fcm/send');
+                            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+                            curl_setopt($ch, CURLOPT_POSTFIELDS, $android_push_body);
+                            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                            curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+                                'Content-Type: application/json',
+                                'Authorization: key=AAAAmLg0GRc:APA91bGaOgw6-8zB6Q_o7A-Qf5BU7ofEQqM5UoMAgIySYgcFQ3aS1z9V9W-Wk9Xa9qRrqaQ47qfo7tzAi4uY-4IzgAPpesbwVOYZQ4QX94VFCQvGLpSS4qaOwJpritlwf-n7BWsvH5jO9sKZAyA56vdcL1Gt1mlKtg'
+                            ));
+                            $response = curl_exec($ch);
+                            $response = json_decode($response, true);
+                            // var_dump($response);die();
                         }
                     }
                 }
