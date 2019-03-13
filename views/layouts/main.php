@@ -11,7 +11,7 @@ use yii\widgets\Breadcrumbs;
 use app\assets\AppAsset;
 
 AppAsset::register($this);
-Yii::$app->user->loginRequired();
+
 ?>
 <?php $this->beginPage() ?>
 <!DOCTYPE html>
