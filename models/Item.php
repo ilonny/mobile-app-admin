@@ -11,8 +11,11 @@ use Yii;
  * @property string $name
  * @property int $item_type_id
  * @property string $description
+ * @property string $name_eng
+ * @property string $description_eng
  *
  * @property ItemType $itemType
+ * @property Quote[] $quotes
  */
 class Item extends \yii\db\ActiveRecord
 {
@@ -32,8 +35,8 @@ class Item extends \yii\db\ActiveRecord
         return [
             [['name'], 'required'],
             [['item_type_id'], 'integer'],
-            [['description'], 'string'],
-            [['name'], 'string', 'max' => 255],
+            [['description', 'description_eng'], 'string'],
+            [['name', 'name_eng'], 'string', 'max' => 255],
             [['item_type_id'], 'exist', 'skipOnError' => true, 'targetClass' => ItemType::className(), 'targetAttribute' => ['item_type_id' => 'id']],
         ];
     }
@@ -48,6 +51,8 @@ class Item extends \yii\db\ActiveRecord
             'name' => 'Name',
             'item_type_id' => 'Item Type ID',
             'description' => 'Description',
+            'name_eng' => 'Name Eng',
+            'description_eng' => 'Description Eng',
         ];
     }
 
@@ -57,5 +62,13 @@ class Item extends \yii\db\ActiveRecord
     public function getItemType()
     {
         return $this->hasOne(ItemType::className(), ['id' => 'item_type_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getQuotes()
+    {
+        return $this->hasMany(Quote::className(), ['item_id' => 'id']);
     }
 }

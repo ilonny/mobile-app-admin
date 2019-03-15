@@ -47,7 +47,16 @@ class ReaderController extends Controller
         }
         //если были данные с формы на добавление, добавим элемент
         $model = new ReaderBook();
+        $need_tocs = false;
+        $need_tocs_eng = false;
+        if (!$model->file_src){
+            $need_tocs = true;
+        }
+        if (!$model->file_src_eng){
+            $need_tocs_eng = true;
+        }
         $uploadModel = new UploadForm();
+        $uploadModelEng = new UploadForm();
         if (Yii::$app->request->isPost) {
             $uploadModel->file = UploadedFile::getInstance($uploadModel, 'file');
             if ($uploadModel->file && $uploadModel->validate() &&  $uploadModel->file->extension == 'epub') {
@@ -56,6 +65,15 @@ class ReaderController extends Controller
                     $model->file_src = $fileName;
                 }
             }
+            //
+            $uploadModelEng->file = UploadedFile::getInstance($uploadModel, 'file_eng');
+            if ($uploadModelEng->file) {
+                $fileNameEng = 'uploads/' . $uploadModelEng->file->baseName . '_eng_' . uniqid() . '.' . $uploadModelEng->file->extension;
+                if ($uploadModelEng->file->saveAs($fileNameEng)) {
+                    $model->file_src_eng = $fileNameEng;
+                }
+            }
+            //
             if ($model->load(Yii::$app->request->post()) && $model->save()) {
                 //copy epub to zip and unzi p it for get tocs of book
                 $fileName = explode('.', $fileName);
@@ -79,6 +97,37 @@ class ReaderController extends Controller
                     $toc_model->book_id = $model->id;
                     $toc_model->save();
                 }
+                ///////
+                /////// todo 
+                /////// протестить создание книги на генерацию глав для англ версии
+                ///////
+                //
+                //код по записи глав для англ аудиокниги
+                //copy epub to zip and unzi p it for get tocs of book
+                $fileName = $fileNameEng;
+                $fileName = explode('.', $fileName);
+                copy($fileName[0].'.epub', $fileName[0].'.zip');
+                $zip = new \ZipArchive;
+                $zip->open($fileName[0].'.zip');
+                $zip->extractTo($fileName[0]);
+                $zip->close();
+                $files=\yii\helpers\FileHelper::findFiles($fileName[0]);
+                foreach ($files as $file_path){
+                    $file_path_arr = explode('/', $file_path);
+                    if ($file_path_arr[count($file_path_arr)-1] == 'toc.ncx'){
+                        $toc_path = $file_path;
+                    }
+                }
+                $xml = simplexml_load_file($toc_path);
+                foreach ($xml->{"navMap"}->{"navPoint"} as $toc){
+                    $toc_model = new Toc();
+                    $toc_model->app_href = $toc->content['src']->__toString();
+                    $toc_model->title = $toc->navLabel->text->__toString();
+                    $toc_model->book_id = $model->id;
+                    $toc_model->other = 'eng';
+                    $toc_model->save();
+                }
+                //
                 return $this->redirect("/reader/edit?id={$model->id}");
             }
         }
@@ -95,18 +144,88 @@ class ReaderController extends Controller
         }
         //если были данные с формы на добавление, добавим элемент
         $model = ReaderBook::findOne($id);
+        $need_tocs = false;
+        $need_tocs_eng = false;
+        if (!$model->file_src){
+            $need_tocs = true;
+        }
+        if (!$model->file_src_eng){
+            $need_tocs_eng = true;
+        }
         $uploadModel = new UploadForm();
+        $uploadModelEng = new UploadForm();
         $audioBooks = AudioBook::find()->all();
         if (Yii::$app->request->isPost) {
             $uploadModel->file = UploadedFile::getInstance($uploadModel, 'file');
-            // var_dump($uploadModel);die();
             if ($uploadModel->file /* && $uploadModel->validate()  &&  $uploadModel->file->extension == 'epub' */) {
                 $fileName = 'uploads/' . $uploadModel->file->baseName . '_' . uniqid() . '.' . $uploadModel->file->extension;
                 if ($uploadModel->file->saveAs($fileName)) {
                     $model->file_src = $fileName;
                 }
             }
+            //
+            $uploadModelEng->file = UploadedFile::getInstance($uploadModel, 'file_eng');
+            if ($uploadModelEng->file) {
+                $fileNameEng = 'uploads/' . $uploadModelEng->file->baseName . '_eng_' . uniqid() . '.' . $uploadModelEng->file->extension;
+                if ($uploadModelEng->file->saveAs($fileNameEng)) {
+                    $model->file_src_eng = $fileNameEng;
+                }
+            }
+            //
             if ($model->load(Yii::$app->request->post()) && $model->save()) {
+                //
+                    if ($need_tocs && $uploadModel->file) {
+                        //код по записи глав для русской аудиокниги
+                        $fileName = explode('.', $fileName);
+                        copy($fileName[0].'.epub', $fileName[0].'.zip');
+                        $zip = new \ZipArchive;
+                        $zip->open($fileName[0].'.zip');
+                        $zip->extractTo($fileName[0]);
+                        $zip->close();
+                        $files=\yii\helpers\FileHelper::findFiles($fileName[0]);
+                        foreach ($files as $file_path){
+                            $file_path_arr = explode('/', $file_path);
+                            if ($file_path_arr[count($file_path_arr)-1] == 'toc.ncx'){
+                                $toc_path = $file_path;
+                            }
+                        }
+                        $xml = simplexml_load_file($toc_path);
+                        foreach ($xml->{"navMap"}->{"navPoint"} as $toc){
+                            $toc_model = new Toc();
+                            $toc_model->app_href = $toc->content['src']->__toString();
+                            $toc_model->title = $toc->navLabel->text->__toString();
+                            $toc_model->book_id = $model->id;
+                            $toc_model->save();
+                        }
+                    }
+                    if ($need_tocs_eng && $uploadModelEng->file) {
+                        //код по записи глав для англ аудиокниги
+                        //copy epub to zip and unzi p it for get tocs of book
+                        $fileName = $fileNameEng;
+                        $fileName = explode('.', $fileName);
+                        copy($fileName[0].'.epub', $fileName[0].'.zip');
+                        $zip = new \ZipArchive;
+                        $zip->open($fileName[0].'.zip');
+                        $zip->extractTo($fileName[0]);
+                        $zip->close();
+                        $files=\yii\helpers\FileHelper::findFiles($fileName[0]);
+                        foreach ($files as $file_path){
+                            $file_path_arr = explode('/', $file_path);
+                            if ($file_path_arr[count($file_path_arr)-1] == 'toc.ncx'){
+                                $toc_path = $file_path;
+                            }
+                        }
+                        $xml = simplexml_load_file($toc_path);
+                        foreach ($xml->{"navMap"}->{"navPoint"} as $toc){
+                            $toc_model = new Toc();
+                            $toc_model->app_href = $toc->content['src']->__toString();
+                            $toc_model->title = $toc->navLabel->text->__toString();
+                            $toc_model->book_id = $model->id;
+                            $toc_model->other = 'eng';
+                            $toc_model->save();
+                        }
+                    }
+                //
                 return $this->redirect('/reader/books');
             }
         }

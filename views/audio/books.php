@@ -35,9 +35,18 @@
                             <tbody>
                                 <?php foreach ($books as $model): ?>
                                     <tr>
-                                        <td><?= $model->name; ?></td>
-                                        <td><?= $model->description; ?></td>
-                                        <td><?= $model->audioAuthor->name; ?></td>
+                                        <td>
+                                            <?= $model->name; ?>
+                                            <?= $model->name_eng ? '<br>('.$model->name_eng.')' : ''; ?>
+                                        </td>
+                                        <td>
+                                            <?= $model->description; ?>
+                                            <?= $model->description_eng ? '<br>('.$model->description_eng.')' : ''; ?>
+                                        </td>
+                                        <td>
+                                            <?= $model->audioAuthor->name; ?>
+                                            <?= $model->audioAuthor->name_eng; ?>
+                                        </td>
                                         <td>
                                             <?= Html::beginForm(['/audio/delete', 'id' => $model->id], 'post'); ?>
                                             <?= Html::submitButton(

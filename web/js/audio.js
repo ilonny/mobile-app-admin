@@ -12,11 +12,13 @@ $(document).ready(function(){
             var name = $("#audiobook-name-modal").val();
             var description = $("#audiobook-description-modal").val();
             var file_data = $('#audiobook-file').prop('files')[0];
+            var language = $("#audiobook-language-modal").val();
             var form_data = new FormData(); 
             form_data.append('file', file_data);
             form_data.append('name', name);
             form_data.append('description', description);
             form_data.append('book_id', book_id);
+            form_data.append('language', language);
             console.log('form_data', form_data);
             $('.modal-footer').html('Загрузка...');
             $.ajax({

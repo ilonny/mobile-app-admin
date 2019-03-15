@@ -35,8 +35,14 @@
                         <tbody>
                             <?php foreach ($quotes as $quote): ?>
                                 <tr>
-                                    <td><?= $quote->title; ?></td>
-                                    <td><?= $quote->getAuthorName(); ?></td>
+                                    <td>
+                                        <?= $quote->title; ?>
+                                        <?= $quote->title_eng ? '<br>('.$quote->title_eng.')' : ''; ?>
+                                    </td>
+                                    <td>
+                                        <?= $quote->getAuthorName(); ?>
+                                        <br><?= $quote->getAuthorNameEng(); ?>
+                                    </td>
                                     <td><?= $quote->getAuthorType(); ?></td>
                                     <td>
                                         <?= Html::beginForm(['/site/delete-quote', 'id' => $quote->id], 'post'); ?>
@@ -66,8 +72,11 @@
                         // ]
                     ]); ?>
                     <?= $form->field($model, 'title')->textInput()->label('Заголовок'); ?>
+                    <?= $form->field($model, 'title_eng')->textInput()->label('Заголовок (на английском)'); ?>
                     <?= $form->field($model, 'text_short')->textInput()->label('Короткое описание (вступительный текст, превью цитаты)'); ?>
+                    <?= $form->field($model, 'text_short_eng')->textInput()->label('Короткое описание на английском (вступительный текст, превью цитаты)'); ?>
                     <?= $form->field($model, 'text')->textarea(['rows' => '6', 'class' => 'gre'])->label('Текст статьи'); ?>
+                    <?= $form->field($model, 'text_eng')->textarea(['rows' => '6', 'class' => 'gre'])->label('Текст статьи (на английском)'); ?>
                     <?php $items = ArrayHelper::map(Item::find()->all(), 'id', 'name'); ?>
                     <?= $form->field($model, 'item_id')->dropDownList($items)->label('Источник'); ?>
                     <?//= $form->field($model, 'item_type_id')->textInput(['type' => 'hidden', 'value' => $type == 'author' ? '1' : '2'])->label(false); ?>

@@ -19,10 +19,10 @@
 </style>
 <div class="body">
     <div class="block">
-        <h3 class="title"><?= $model->title; ?></h3>
+        <h3 class="title"><?= $lang == 'ru' ? $model->title : $model->title_eng; ?></h3>
         <div class="img-wrap">
             <img src="/uploads/<?= $model->img_src; ?>" >
         </div>
-        <div class="content"><?= $model->text;?></div>
+        <div class="content"><?= $lang == 'ru' ? $model->text : $model->text_eng;?></div>
     </div>
 </div>

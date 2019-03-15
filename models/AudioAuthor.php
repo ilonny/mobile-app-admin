@@ -10,6 +10,7 @@ use Yii;
  * @property int $id
  * @property string $name
  * @property string $description
+ * @property string $name_eng
  *
  * @property AudioBook[] $audioBooks
  */
@@ -31,7 +32,7 @@ class AudioAuthor extends \yii\db\ActiveRecord
         return [
             [['name'], 'required'],
             [['description'], 'string'],
-            [['name'], 'string', 'max' => 255],
+            [['name', 'name_eng'], 'string', 'max' => 255],
         ];
     }
 
@@ -44,6 +45,7 @@ class AudioAuthor extends \yii\db\ActiveRecord
             'id' => 'ID',
             'name' => 'Name',
             'description' => 'Description',
+            'name_eng' => 'Name Eng',
         ];
     }
 

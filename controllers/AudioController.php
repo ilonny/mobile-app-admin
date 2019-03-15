@@ -118,9 +118,11 @@ class AudioController extends Controller
         if (Yii::$app->user->isGuest) {
             Yii::$app->user->loginRequired();
         }
-        $audiofiles = Audiofile::find()->andWhere(['audio_book_id' => $book_id])->orderBy('sort')->all();
+        $audiofiles = Audiofile::find()->andWhere(['audio_book_id' => $book_id, 'other' => null])->orderBy('sort')->all();
+        $audiofiles_eng = Audiofile::find()->andWhere(['audio_book_id' => $book_id, 'other' => 'eng'])->orderBy('sort')->all();
         return $this->renderAjax('render-audio-list', [
             'audiofiles' => $audiofiles,
+            'audiofiles_eng' => $audiofiles_eng,
         ]);
     }
 
@@ -146,6 +148,9 @@ class AudioController extends Controller
             $model->file_src = $file_src;
             $model->audio_book_id = $form_data['book_id'];
             $model->sort = $max_sort + 1;
+            if ($form_data['language'] == '2') {
+                $model->other = 'eng';
+            }
             if ($model->save()){
                 return json_encode(['status' => 200, 'message' => 'Успешно сохранено'], JSON_UNESCAPED_UNICODE);
             }
@@ -167,8 +172,15 @@ class AudioController extends Controller
 
     public function actionGetAudiofiles($audioBookId, $toc){
         $audioBook = AudioBook::findOne($audioBookId);
+        $book_id = $audioBook->id;
         $toc = Toc::findOne($toc);
-        $audiofiles = $audioBook->audiofiles;
+        if ($toc->other == 'eng'){
+            $audiofiles = Audiofile::find()->andWhere(['audio_book_id' => $book_id, 'other' => 'eng'])->orderBy('sort')->all();
+            // var_dump($book_id);die();
+        } else {
+            $audiofiles = Audiofile::find()->andWhere(['audio_book_id' => $book_id, 'other' => null])->orderBy('sort')->all();
+            // $audiofiles = $audioBook->audiofiles;
+        }
         return $this->renderAjax('render-audio-select', [
             'audiofiles' => $audiofiles,
             'audioBook' => $audioBook,

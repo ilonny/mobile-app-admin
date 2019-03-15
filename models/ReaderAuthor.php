@@ -10,6 +10,9 @@ use Yii;
  * @property int $id
  * @property string $name
  * @property string $description
+ * @property string $name_eng
+ *
+ * @property ReaderBook[] $readerBooks
  */
 class ReaderAuthor extends \yii\db\ActiveRecord
 {
@@ -29,7 +32,7 @@ class ReaderAuthor extends \yii\db\ActiveRecord
         return [
             [['name'], 'required'],
             [['description'], 'string'],
-            [['name'], 'string', 'max' => 255],
+            [['name', 'name_eng'], 'string', 'max' => 255],
         ];
     }
 
@@ -42,6 +45,15 @@ class ReaderAuthor extends \yii\db\ActiveRecord
             'id' => 'ID',
             'name' => 'Name',
             'description' => 'Description',
+            'name_eng' => 'Name Eng',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getReaderBooks()
+    {
+        return $this->hasMany(ReaderBook::className(), ['reader_author_id' => 'id']);
     }
 }

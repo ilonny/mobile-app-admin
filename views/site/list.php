@@ -23,7 +23,10 @@
                     <?php if ($items): ?>
                         <?php foreach ($items as $model): ?>
                             <div class="list-group-item clearfix">
-                                <span><?= $model->name; ?></span>
+                                <span>
+                                    <?= $model->name; ?>
+                                    <?= $model->name_eng ? '<br>('.$model->name_eng.')' : ''; ?>
+                                </span>
                                 <?= Html::beginForm(['/site/delete', 'id' => $model->id], 'post'); ?>
                                 <?= Html::submitButton(
                                         'удалить',
@@ -43,8 +46,10 @@
                         $model = new Item;
                     ?>
                     <?= $form->field($model, 'name')->textInput()->label('Наименование'); ?>
+                    <?= $form->field($model, 'name_eng')->textInput()->label('Наименование (На английском)'); ?>
                     <?= $form->field($model, 'item_type_id')->textInput(['type' => 'hidden', 'value' => $type == 'author' ? '1' : '2'])->label(false); ?>
                     <?= $form->field($model, 'description')->textInput()->label('Короткое описание (не обязательно)'); ?>
+                    <?= $form->field($model, 'description_eng')->textInput()->label('Короткое описание на английском (не обязательно)'); ?>
                     <div class="form-group">
                         <?= Html::submitButton('Сохранить', ['class' => 'btn btn-primary']) ?>
                     </div>

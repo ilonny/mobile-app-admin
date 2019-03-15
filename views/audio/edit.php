@@ -6,12 +6,14 @@
     use app\models\AudioAuthor;
     use yii\helpers\ArrayHelper;
     $form = ActiveForm::begin();
-    $this->registerJsFile('/js/audio.js', ['depends' => '\app\assets\AppAsset']);
+    $this->registerJsFile('/js/audio.js?v=2', ['depends' => '\app\assets\AppAsset']);
 ?>
 <h1>Редактирование аудиокниги id = <?=$model->id?></h1>
 <?= $form->field($model, 'name')->textInput()->label('Наименование'); ?>
+<?= $form->field($model, 'name_eng')->textInput()->label('Наименование на английском'); ?>
 <?//= $form->field($model, 'item_type_id')->textInput(['type' => 'hidden', 'value' => $type == 'author' ? '1' : '2'])->label(false); ?>
 <?= $form->field($model, 'description')->textInput()->label('Короткое описание (не обязательно)'); ?>
+<?= $form->field($model, 'description_eng')->textInput()->label('Короткое описание на английском (не обязательно)'); ?>
 <?php $audio_authors = ArrayHelper::map(AudioAuthor::find()->all(), 'id', 'name'); ?>
 <?= $form->field($model, 'audio_author_id')->dropDownList($audio_authors)->label('Автор'); ?>
 <div class="form-group">

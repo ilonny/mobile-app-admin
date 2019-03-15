@@ -3,7 +3,7 @@
 namespace app\models;
 
 use Yii;
-use app\models\Item;
+
 /**
  * This is the model class for table "quote".
  *
@@ -14,6 +14,9 @@ use app\models\Item;
  * @property int $item_id
  * @property int $date
  * @property string $img_src
+ * @property string $title_eng
+ * @property string $text_short_eng
+ * @property string $text_eng
  *
  * @property Item $item
  */
@@ -34,9 +37,9 @@ class Quote extends \yii\db\ActiveRecord
     {
         return [
             [['title'], 'required'],
-            [['text_short', 'text'], 'string'],
+            [['text_short', 'text', 'text_eng'], 'string'],
             [['item_id', 'date'], 'integer'],
-            [['title', 'img_src'], 'string', 'max' => 255],
+            [['title', 'img_src', 'title_eng', 'text_short_eng'], 'string', 'max' => 255],
             [['item_id'], 'exist', 'skipOnError' => true, 'targetClass' => Item::className(), 'targetAttribute' => ['item_id' => 'id']],
         ];
     }
@@ -54,6 +57,9 @@ class Quote extends \yii\db\ActiveRecord
             'item_id' => 'Item ID',
             'date' => 'Date',
             'img_src' => 'Img Src',
+            'title_eng' => 'Title Eng',
+            'text_short_eng' => 'Text Short Eng',
+            'text_eng' => 'Text Eng',
         ];
     }
 
@@ -84,9 +90,15 @@ class Quote extends \yii\db\ActiveRecord
         } else {
             return 'Не указано';
         }
-        // if ($item->item_type_id == 1){
-        // } else {
-        //     return $item->title;
-        // }
+    }
+
+    public function getAuthorNameEng($id)
+    {
+        $item = Item::find()->andWhere(['id' => $this->item_id])->one();
+        if ($item->name_eng){
+            return $item->name_eng;
+        } else {
+            return $item->name;
+        }
     }
 }

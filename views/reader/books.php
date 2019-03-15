@@ -35,9 +35,18 @@
                             <tbody>
                                 <?php foreach ($books as $model): ?>
                                     <tr>
-                                        <td><?= $model->name; ?></td>
-                                        <td><?= $model->description; ?></td>
-                                        <td><?= $model->readerAuthor->name; ?></td>
+                                        <td>
+                                            <?= $model->name; ?>
+                                            <?= $model->name_eng ? '<br>('.$model->name_eng.')' : ''; ?>
+                                        </td>
+                                        <td>
+                                            <?= $model->description; ?>
+                                            <?= $model->description_eng ? '<br>('.$model->description_eng.')' : ''; ?>
+                                        </td>
+                                        <td>
+                                            <?= $model->readerAuthor->name; ?>
+                                            <?= $model->readerAuthor->name_eng; ?>
+                                        </td>
                                         <td>
                                             <?= Html::beginForm(['/reader/delete', 'id' => $model->id], 'post'); ?>
                                             <?= Html::submitButton(
@@ -61,12 +70,14 @@
                         $model = new ReaderBook;
                     ?>
                     <?= $form->field($model, 'name')->textInput()->label('Наименование'); ?>
+                    <?= $form->field($model, 'name_eng')->textInput()->label('Наименование на английском'); ?>
                     <?//= $form->field($model, 'item_type_id')->textInput(['type' => 'hidden', 'value' => $type == 'author' ? '1' : '2'])->label(false); ?>
                     <?= $form->field($model, 'description')->textInput()->label('Короткое описание (не обязательно)'); ?>
+                    <?= $form->field($model, 'description_eng')->textInput()->label('Короткое описание на английском (не обязательно)'); ?>
                     <?php $reader_authors = ArrayHelper::map(ReaderAuthor::find()->all(), 'id', 'name'); ?>
                     <?= $form->field($model, 'reader_author_id')->dropDownList($reader_authors)->label('Автор'); ?>
                     <?= $form->field($uploadModel, 'file')->fileInput()->label('Загрузить книгу'); ?>
-
+                    <?= $form->field($uploadModel, 'file_eng')->fileInput()->label("Загрузить книгу английская версия (загруженный файл {$model->file_src_eng})"); ?>
                     <div class="form-group">
                         <?= Html::submitButton('Сохранить', ['class' => 'btn btn-primary']) ?>
                     </div>
