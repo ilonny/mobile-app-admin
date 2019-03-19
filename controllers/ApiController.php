@@ -84,16 +84,16 @@ class ApiController extends Controller
         }
         if ($lang = 'en') {
             $models = Item::find()
-                ->select(['id', 'name_eng', 'item_type_id', 'description_eng'])
+                ->select(['id', 'name_eng as name', 'item_type_id', 'description_eng as description'])
                 ->andWhere(['is not', 'name_eng', NULL])
                 ->all();
             $authors = Item::find()
-                ->select(['id', 'name_eng', 'item_type_id', 'description_eng'])
+                ->select(['id', 'name_eng as name', 'item_type_id', 'description_eng as description'])
                 ->where(['item_type_id' => 1])
                 ->andWhere(['is not', 'name_eng', NULL])
                 ->all();
             $books = Item::find()
-                ->select(['id', 'name_eng', 'item_type_id', 'description_eng'])
+                ->select(['id', 'name_eng as name', 'item_type_id', 'description_eng as description'])
                 ->where(['item_type_id' => 2])
                 ->andWhere(['is not', 'name_eng', NULL])
                 ->all();
@@ -105,6 +105,7 @@ class ApiController extends Controller
     }
 
     public function actionQuotes($items, $lang = 'ru'){
+        $res = [];
         if ($lang == 'ru') {
             if ($items == '[all]'){
                 $models = Quote::find()
@@ -127,7 +128,7 @@ class ApiController extends Controller
             // return JSON::encode($res, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE);
             return JSON::encode($res);
         }
-        if ($lang == 'en') {
+        if ($lang == 'en' || $lang == 'eng') {
             if ($items == '[all]'){
                 $models = Quote::find()
                     ->select(['id', 'title_eng', 'text_short_eng', 'text_eng', 'item_id', 'date', 'img_src'])
@@ -155,19 +156,29 @@ class ApiController extends Controller
         }
     }
 
-    public function actionFavorites($items){
-        // return $items;
-        // Yii::$app->response->format = Response::FORMAT_JSON;
-        $req = JSON::decode($items);
-        $models = Quote::find()->where(['in', 'id', $req])->all();
-        foreach ($models as $key => $model){
-            $res[$key]['id'] = $model->id;
-            $res[$key]['title'] = $model->title;
-            $res[$key]['text_short'] = $model->text_short;
-            $res[$key]['author_name'] = $model->getAuthorName();
+    public function actionFavorites($items, $lang = 'ru'){
+        if ($lang == 'ru') {
+            $req = JSON::decode($items);
+            $models = Quote::find()->where(['in', 'id', $req])->all();
+            foreach ($models as $key => $model){
+                $res[$key]['id'] = $model->id;
+                $res[$key]['title'] = $model->title;
+                $res[$key]['text_short'] = $model->text_short;
+                $res[$key]['author_name'] = $model->getAuthorName();
+            }
+            return JSON::encode($res);
         }
-        // return JSON::encode($res, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE);
-        return JSON::encode($res);
+        if ($lang == 'en' || $lang == 'eng') {
+            $req = JSON::decode($items);
+            $models = Quote::find()->where(['in', 'id', $req])->all();
+            foreach ($models as $key => $model){
+                $res[$key]['id'] = $model->id;
+                $res[$key]['title'] = $model->title_eng;
+                $res[$key]['text_short'] = $model->text_short_eng;
+                $res[$key]['author_name'] = $model->getAuthorNameEng();
+            }
+            return JSON::encode($res);
+        }
     }
 
     public function actionQuote($id, $lang = 'ru'){
@@ -183,7 +194,7 @@ class ApiController extends Controller
         ]);
     }
 
-    public function actionSetToken($token, $settings, $news_settings = '["content","read","look","listen","important"]', $version = '1'){
+    public function actionSetToken($token, $settings, $news_settings = '["content","read","look","listen","important"]', $version = '1', $lang = 'ru'){
         if ($news_settings == 'news,read,look,listen,important' || $news_settings == "['news', 'read', 'look', 'listen', 'important']") {
             $news_settings = '["content","read","look","listen","important"]';
         }
@@ -213,6 +224,7 @@ class ApiController extends Controller
             $model->news_settings = $news_settings;
             $model->version = $version;
             $model->other = $token_clear;
+            $model->lang = $lang;
             if ($model->save()){
                 return 'success';
             } else {
@@ -231,6 +243,7 @@ class ApiController extends Controller
             }
             // $model->news_settings = $news_settings;
             $model->version = $version;
+            $model->lang = $lang;
             // var_dump($model);die();
             if ($model->update()){
                 return 'success';
@@ -244,6 +257,7 @@ class ApiController extends Controller
         if ($lang == 'ru') {
             $books = ReaderBook::find()
                 ->select(['id', 'name', 'description', 'reader_author_id', 'file_src', 'other'])
+                ->andWhere(['is not', 'file_src', NULL])
                 ->all();
             $response = [];
             $books_arr = [];
@@ -272,7 +286,7 @@ class ApiController extends Controller
         } else {
             $books = ReaderBook::find()
                 ->select(['id', 'name_eng', 'description_eng', 'reader_author_id', 'file_src_eng', 'other'])
-                ->andWhere(['is not', 'name_eng', NULL])
+                ->andWhere(['is not', 'file_src_eng', NULL])
                 ->all();
             $response = [];
             $books_arr = [];
@@ -324,7 +338,10 @@ class ApiController extends Controller
 
     public function actionGetTocs($book_id, $lang = 'ru'){
         if ($lang == 'ru') {
-            $models = Toc::find()->andWhere(['book_id' => $book_id])->all();
+            $models = Toc::find()
+                ->andWhere(['book_id' => $book_id])
+                ->andWhere(['is', 'other', NULL])
+                ->all();
             $arr = [];
             foreach ($models as $model){
                 $audio_book_name = "";
@@ -344,7 +361,7 @@ class ApiController extends Controller
             }
             return json_encode($arr, JSON_UNESCAPED_UNICODE);
         }
-        if ($lang == 'en') {
+        if ($lang == 'en' || $lang == 'eng') {
             $models = Toc::find()->andWhere(['book_id' => $book_id, 'other' => 'eng'])->all();
             $arr = [];
             foreach ($models as $model){
@@ -420,9 +437,10 @@ class ApiController extends Controller
             }
             return json_encode($books_arr, JSON_UNESCAPED_UNICODE);
         }
-        if ($lang == 'en') {
+        if ($lang == 'en' || $lang == 'eng') {
             $books = AudioBook::find()
             ->select(['id', 'name_eng', 'description_eng', 'audio_author_id', 'file_src_eng', 'other'])
+            // ->select(['id', 'name_eng as name', 'description_eng as description', 'audio_author_id', 'file_src_eng as file_src', 'other'])
             ->andWhere(['is not', 'name_eng', NULL])
             ->all();
             $books_arr = [];
@@ -505,7 +523,7 @@ class ApiController extends Controller
             }
             return json_encode($books_arr, JSON_UNESCAPED_UNICODE);
         }
-        if ($lang == 'en') {
+        if ($lang == 'en' || $lang == 'eng') {
             $books = Audiofile::find()
             // ->andWhere(['audio_book_id' => $book_id])->orderBy('sort')->all();
                 ->andWhere(['audio_book_id' => $book_id, 'other' => 'eng'])

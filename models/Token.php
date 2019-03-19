@@ -3,7 +3,7 @@
 namespace app\models;
 
 use Yii;
-use yii\httpclient\Client;
+
 /**
  * This is the model class for table "token".
  *
@@ -11,6 +11,7 @@ use yii\httpclient\Client;
  * @property string $token
  * @property string $settings
  * @property string $other
+ * @property string $lang
  */
 class Token extends \yii\db\ActiveRecord
 {
@@ -29,7 +30,8 @@ class Token extends \yii\db\ActiveRecord
     {
         return [
             [['token', 'settings'], 'required'],
-            [['token', 'settings', 'other', 'version', 'news_settings'], 'string'],
+            [['token', 'settings', 'other'], 'string'],
+            [['lang'], 'string', 'max' => 255],
         ];
     }
 
@@ -43,8 +45,7 @@ class Token extends \yii\db\ActiveRecord
             'token' => 'Token',
             'settings' => 'Settings',
             'other' => 'Other',
-            'version' => 'Vther',
-            'news_settings' => 'NewsSettings',
+            'lang' => 'Lang',
         ];
     }
 
