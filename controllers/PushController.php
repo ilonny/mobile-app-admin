@@ -123,13 +123,25 @@ class PushController extends Controller
             //сформируем массив из рандомных цитат которые мы будем отправлять
             $settings = Item::find()->all();
             $random_quotes = [];
+            $random_quotes_eng = [];
             foreach($settings as $setting){
                 //для каждого автора найдем список цитат
-                $quotes = Quote::find()->andWhere(['item_id' => $setting->id])->all();
+                $quotes = Quote::find()
+                    ->andWhere(['item_id' => $setting->id])
+                    ->andWhere(['is not', 'title', NULL])
+                    ->all();
+                $quotes_eng = Quote::find()
+                    ->andWhere(['item_id' => $setting->id])
+                    ->andWhere(['is not', 'title_eng', NULL])
+                    ->all();
                 //возьмем из них рандомную
                 $rand_id = rand(0, count($quotes)-1);
                 if ($quotes[$rand_id]->text_short){
                     $random_quotes[] = $quotes[$rand_id];
+                }
+                $rand_id_eng = rand(0, count($quotes_eng)-1);
+                if ($quotes_eng[$rand_id_eng]->text_short_eng){
+                    $random_quotes_eng[] = $quotes_eng[$rand_id_eng];
                 }
             }
             //берем теперь все токены и прогоням их. отправляя пуш цитаты, если токен подписан на источник этой цитаты
@@ -153,8 +165,15 @@ class PushController extends Controller
                 } else {
                     $token_platform = 'android';
                 }
-                //для каждой цитаты определимся есть ли подписка? если есть - отправим пуш 
-                foreach ($random_quotes as $key => $quote){
+                //для каждой цитаты определимся есть ли подписка? если есть - отправим пуш
+                if ($token->lang == 'eng' || $token->lang == 'en') {
+                    $quotes_arr = $random_quotes_eng;
+                    $lang = 'eng';
+                } else {
+                    $quotes_arr = $random_quotes;
+                    $lang = 'ru';
+                }
+                foreach ($quotes_arr as $key => $quote){
                     $need_to_push = false;
                     if ($token->settings == 'all'){
                         $need_to_push = true;
@@ -172,9 +191,9 @@ class PushController extends Controller
                                 "quote_id" => $quote->id,
                                 "aps" => [
                                     "alert" => [
-                                        "title" => $quote->getAuthorName(),
+                                        "title" => $lang == 'eng' ? $quote->getAuthorNameEng() : $quote->getAuthorName(),
                                         // "subtitle" => $quote->title,
-                                        "body" => $quote->text_short
+                                        "body" => $lang == 'eng' ? $quote->text_short_eng : $quote->text_short
                                     ],
                                     "sound" => "default",
                                 ],
@@ -198,10 +217,10 @@ class PushController extends Controller
                                 'to' => $token->other,
                                 'data' => array(
                                     'body' => array(
-                                        'text' => $quote->text_short,
+                                        'text' => $lang == 'eng' ? $quote->text_short_eng : $quote->text_short,
                                         'q_id' => intval($quote->id),
                                     ),
-                                    'title' => $quote->getAuthorName()
+                                    'title' => $lang == 'eng' ? $quote->getAuthorNameEng() : $quote->getAuthorName(),
                                 )
                             ], JSON_UNESCAPED_UNICODE);
                             $ch = curl_init('https://fcm.googleapis.com/fcm/send');

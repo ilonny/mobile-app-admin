@@ -19,6 +19,13 @@ class ScsController extends Controller
         $document = \phpQuery::newDocument($html_src);
         $root_span = $document->find('span.m1_grey');
         $parent_td = $root_span->parent();
+        $all_img = $parent_td->find('img');
+        foreach ($parent_td->find('img') as $key => $img) {
+            $img = pq($img);
+            // var_dump($img->attr('src'));die();
+            $attr = 'http://scsmath.com/' . $img->attr('src');
+            $img->attr('src', $attr);
+        }
         $blocks = $parent_td->find('blockquote.list');
         // echo $parent_td->html();
         $this->layout = 'api';
