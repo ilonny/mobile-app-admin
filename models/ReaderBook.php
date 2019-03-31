@@ -36,7 +36,6 @@ class ReaderBook extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['name'], 'required'],
             [['name', 'description', 'file_src', 'other', 'description_eng', 'file_src_eng'], 'string'],
             [['reader_author_id'], 'integer'],
             [['name_eng'], 'string', 'max' => 255],
