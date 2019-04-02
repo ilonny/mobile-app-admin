@@ -110,12 +110,16 @@ class ApiController extends Controller
             if ($items == '[all]'){
                 $models = Quote::find()
                     ->select(['id', 'title', 'text_short', 'text', 'item_id', 'date', 'img_src'])
+                    ->andWhere(['is not', 'title', NULL])
+                    ->andWhere(['<>', 'title', ''])
                     ->orderBy('id DESC')->all();
             } else {
                 $req = JSON::decode($items);
                 $models = Quote::find()
                     ->select(['id', 'title', 'text_short', 'text', 'item_id', 'date', 'img_src'])
                     ->where(['in', 'item_id', $req])
+                    ->andWhere(['is not', 'title', NULL])
+                    ->andWhere(['<>', 'title', ''])
                     ->orderBy('id DESC')->all();
             }
             foreach ($models as $key => $model){

@@ -129,10 +129,12 @@ class PushController extends Controller
                 $quotes = Quote::find()
                     ->andWhere(['item_id' => $setting->id])
                     ->andWhere(['is not', 'title', NULL])
+                    ->andWhere(['<>', 'title', ''])
                     ->all();
                 $quotes_eng = Quote::find()
                     ->andWhere(['item_id' => $setting->id])
                     ->andWhere(['is not', 'title_eng', NULL])
+                    ->andWhere(['<>', 'title_eng', ''])
                     ->all();
                 //возьмем из них рандомную
                 $rand_id = rand(0, count($quotes)-1);

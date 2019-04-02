@@ -36,7 +36,6 @@ class Quote extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['title'], 'required'],
             [['text_short', 'text', 'text_eng'], 'string'],
             [['item_id', 'date'], 'integer'],
             [['title', 'img_src', 'title_eng', 'text_short_eng'], 'string', 'max' => 255],
