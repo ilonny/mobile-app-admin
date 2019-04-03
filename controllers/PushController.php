@@ -146,6 +146,7 @@ class PushController extends Controller
                     $random_quotes_eng[] = $quotes_eng[$rand_id_eng];
                 }
             }
+            
             //берем теперь все токены и прогоням их. отправляя пуш цитаты, если токен подписан на источник этой цитаты
             if ($offset == 0) {
                 $tokens = Token::find()->limit(10)->all();
@@ -287,7 +288,7 @@ class PushController extends Controller
                 // var_dump($data['PREVIEW_TEXT']);die();
                 // var_dump($_GET);
                 // echo 123;
-                $tokens = Token::find()->where(['version' => '2'])->all();
+                $tokens = Token::find()->where(['version' => '2'])->andWhere(['<>', 'lang', 'eng'])->andWhere(['<>', 'lang', 'en'])->all();
                 // var_dump($tokens);die();
                 // $tokens = Token::find()->where(['id' => 299])->all();
                 
