@@ -30,7 +30,6 @@ class AudioAuthor extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['name'], 'required'],
             [['description'], 'string'],
             [['name', 'name_eng'], 'string', 'max' => 255],
         ];

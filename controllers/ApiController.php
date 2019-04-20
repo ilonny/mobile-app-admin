@@ -137,6 +137,7 @@ class ApiController extends Controller
                 $models = Quote::find()
                     ->select(['id', 'title_eng', 'text_short_eng', 'text_eng', 'item_id', 'date', 'img_src'])
                     ->andWhere(['is not', 'title_eng', NULL])
+                    ->andWhere(['<>', 'title_eng', ''])
                     ->orderBy('id DESC')
                     ->all();
             } else {
@@ -145,6 +146,7 @@ class ApiController extends Controller
                     ->select(['id', 'title_eng', 'text_short_eng', 'text_eng', 'item_id', 'date', 'img_src'])
                     ->where(['in', 'item_id', $req])
                     ->andWhere(['is not', 'title_eng', NULL])
+                    ->andWhere(['<>', 'title_eng', ''])
                     ->orderBy('id DESC')
                     ->all();
             }
