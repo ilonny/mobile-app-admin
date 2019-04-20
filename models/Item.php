@@ -13,6 +13,8 @@ use Yii;
  * @property string $description
  * @property string $name_eng
  * @property string $description_eng
+ * @property string $name_es
+ * @property string $description_es
  *
  * @property ItemType $itemType
  * @property Quote[] $quotes
@@ -33,10 +35,9 @@ class Item extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['name'], 'required'],
             [['item_type_id'], 'integer'],
-            [['description', 'description_eng'], 'string'],
-            [['name', 'name_eng'], 'string', 'max' => 255],
+            [['description', 'description_eng', 'description_es'], 'string'],
+            [['name', 'name_eng', 'name_es'], 'string', 'max' => 255],
             [['item_type_id'], 'exist', 'skipOnError' => true, 'targetClass' => ItemType::className(), 'targetAttribute' => ['item_type_id' => 'id']],
         ];
     }
@@ -53,6 +54,8 @@ class Item extends \yii\db\ActiveRecord
             'description' => 'Description',
             'name_eng' => 'Name Eng',
             'description_eng' => 'Description Eng',
+            'name_es' => 'Name Es',
+            'description_es' => 'Description Es',
         ];
     }
 

@@ -26,6 +26,7 @@
                                 <span>
                                     <?= $model->name; ?>
                                     <?= $model->name_eng ? '<br>('.$model->name_eng.')' : ''; ?>
+                                    <?= $model->name_es ? '<br>('.$model->name_es.')' : ''; ?>
                                 </span>
                                 <?= Html::beginForm(['/site/delete', 'id' => $model->id], 'post'); ?>
                                 <?= Html::submitButton(
@@ -47,9 +48,11 @@
                     ?>
                     <?= $form->field($model, 'name')->textInput()->label('Наименование'); ?>
                     <?= $form->field($model, 'name_eng')->textInput()->label('Наименование (На английском)'); ?>
+                    <?= $form->field($model, 'name_es')->textInput()->label('Наименование (На испанском)'); ?>
                     <?= $form->field($model, 'item_type_id')->textInput(['type' => 'hidden', 'value' => $type == 'author' ? '1' : '2'])->label(false); ?>
                     <?= $form->field($model, 'description')->textInput()->label('Короткое описание (не обязательно)'); ?>
                     <?= $form->field($model, 'description_eng')->textInput()->label('Короткое описание на английском (не обязательно)'); ?>
+                    <?= $form->field($model, 'description_es')->textInput()->label('Короткое описание на испанском (не обязательно)'); ?>
                     <div class="form-group">
                         <?= Html::submitButton('Сохранить', ['class' => 'btn btn-primary']) ?>
                     </div>

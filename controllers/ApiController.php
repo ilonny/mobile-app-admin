@@ -70,32 +70,64 @@ class ApiController extends Controller
         if ($lang == 'ru') {
             $models = Item::find()
                 ->select(['id', 'name', 'item_type_id', 'description'])
+                ->andWhere(['is not', 'name', NULL])
+                ->andWhere(['<>', 'name', ''])
                 ->all();
             $authors = Item::find()
                 ->select(['id', 'name', 'item_type_id', 'description'])
-                ->where(['item_type_id' => 1])->all();
+                ->andWhere(['is not', 'name', NULL])
+                ->andWhere(['<>', 'name', ''])
+                ->andWhere(['item_type_id' => 1])->all();
             $books = Item::find()
                 ->select(['id', 'name', 'item_type_id', 'description'])
-                ->where(['item_type_id' => 2])->all();
+                ->andWhere(['is not', 'name', NULL])
+                ->andWhere(['<>', 'name', ''])
+                ->andWhere(['item_type_id' => 2])->all();
             $return['all_items'] = $models;
             $return['authors'] = $authors;
             $return['books'] = $books;
             return Json::encode($return);
         }
-        if ($lang = 'en') {
+        if ($lang == 'en') {
             $models = Item::find()
                 ->select(['id', 'name_eng as name', 'item_type_id', 'description_eng as description'])
                 ->andWhere(['is not', 'name_eng', NULL])
+                ->andWhere(['<>', 'name_eng', ''])
                 ->all();
             $authors = Item::find()
                 ->select(['id', 'name_eng as name', 'item_type_id', 'description_eng as description'])
-                ->where(['item_type_id' => 1])
+                ->andWhere(['item_type_id' => 1])
                 ->andWhere(['is not', 'name_eng', NULL])
+                ->andWhere(['<>', 'name_eng', ''])
                 ->all();
             $books = Item::find()
                 ->select(['id', 'name_eng as name', 'item_type_id', 'description_eng as description'])
-                ->where(['item_type_id' => 2])
+                ->andWhere(['item_type_id' => 2])
                 ->andWhere(['is not', 'name_eng', NULL])
+                ->andWhere(['<>', 'name_eng', ''])
+                ->all();
+            $return['all_items'] = $models;
+            $return['authors'] = $authors;
+            $return['books'] = $books;
+            return Json::encode($return);
+        }
+        if ($lang == 'es') {
+            $models = Item::find()
+                ->select(['id', 'name_es as name', 'item_type_id', 'description_es as description'])
+                ->andWhere(['is not', 'name_es', NULL])
+                ->andWhere(['<>', 'name_es', ''])
+                ->all();
+            $authors = Item::find()
+                ->select(['id', 'name_es as name', 'item_type_id', 'description_es as description'])
+                ->andWhere(['item_type_id' => 1])
+                ->andWhere(['is not', 'name_es', NULL])
+                ->andWhere(['<>', 'name_es', ''])
+                ->all();
+            $books = Item::find()
+                ->select(['id', 'name_es as name', 'item_type_id', 'description_es as description'])
+                ->andWhere(['item_type_id' => 2])
+                ->andWhere(['is not', 'name_es', NULL])
+                ->andWhere(['<>', 'name_es', ''])
                 ->all();
             $return['all_items'] = $models;
             $return['authors'] = $authors;
