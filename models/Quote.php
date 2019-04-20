@@ -17,6 +17,9 @@ use Yii;
  * @property string $title_eng
  * @property string $text_short_eng
  * @property string $text_eng
+ * @property string $title_es
+ * @property string $text_short_es
+ * @property string $text_es
  *
  * @property Item $item
  */
@@ -36,9 +39,9 @@ class Quote extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['text_short', 'text', 'text_eng'], 'string'],
+            [['text_short', 'text', 'text_eng', 'text_es'], 'string'],
             [['item_id', 'date'], 'integer'],
-            [['title', 'img_src', 'title_eng', 'text_short_eng'], 'string', 'max' => 255],
+            [['title', 'img_src', 'title_eng', 'text_short_eng', 'title_es', 'text_short_es'], 'string', 'max' => 255],
             [['item_id'], 'exist', 'skipOnError' => true, 'targetClass' => Item::className(), 'targetAttribute' => ['item_id' => 'id']],
         ];
     }
@@ -59,6 +62,9 @@ class Quote extends \yii\db\ActiveRecord
             'title_eng' => 'Title Eng',
             'text_short_eng' => 'Text Short Eng',
             'text_eng' => 'Text Eng',
+            'title_es' => 'Title Es',
+            'text_short_es' => 'Text Short Es',
+            'text_es' => 'Text Es',
         ];
     }
 
@@ -96,6 +102,15 @@ class Quote extends \yii\db\ActiveRecord
         $item = Item::find()->andWhere(['id' => $this->item_id])->one();
         if ($item->name_eng){
             return $item->name_eng;
+        } else {
+            return $item->name;
+        }
+    }
+    public function getAuthorNameEs($id)
+    {
+        $item = Item::find()->andWhere(['id' => $this->item_id])->one();
+        if ($item->name_es){
+            return $item->name_es;
         } else {
             return $item->name;
         }

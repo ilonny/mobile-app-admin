@@ -124,6 +124,7 @@ class PushController extends Controller
             $settings = Item::find()->all();
             $random_quotes = [];
             $random_quotes_eng = [];
+            $random_quotes_es = [];
             foreach($settings as $setting){
                 //для каждого автора найдем список цитат
                 $quotes = Quote::find()
@@ -136,14 +137,23 @@ class PushController extends Controller
                     ->andWhere(['is not', 'title_eng', NULL])
                     ->andWhere(['<>', 'title_eng', ''])
                     ->all();
+                $quotes_es = Quote::find()
+                    ->andWhere(['item_id' => $setting->id])
+                    ->andWhere(['is not', 'title_es', NULL])
+                    ->andWhere(['<>', 'title_es', ''])
+                    ->all();
                 //возьмем из них рандомную
                 $rand_id = rand(0, count($quotes)-1);
                 if ($quotes[$rand_id]->text_short){
                     $random_quotes[] = $quotes[$rand_id];
                 }
                 $rand_id_eng = rand(0, count($quotes_eng)-1);
+                $rand_id_es = rand(0, count($quotes_es)-1);
                 if ($quotes_eng[$rand_id_eng]->text_short_eng){
                     $random_quotes_eng[] = $quotes_eng[$rand_id_eng];
+                }
+                if ($quotes_es[$rand_id_es]->text_short_es){
+                    $random_quotes_es[] = $quotes_es[$rand_id_es];
                 }
             }
             
@@ -172,6 +182,9 @@ class PushController extends Controller
                 if ($token->lang == 'eng' || $token->lang == 'en') {
                     $quotes_arr = $random_quotes_eng;
                     $lang = 'eng';
+                } else if ($token->lang == 'es') {
+                    $quotes_arr = $random_quotes_es;
+                    $lang = 'es';
                 } else {
                     $quotes_arr = $random_quotes;
                     $lang = 'ru';
@@ -194,9 +207,9 @@ class PushController extends Controller
                                 "quote_id" => $quote->id,
                                 "aps" => [
                                     "alert" => [
-                                        "title" => $lang == 'eng' ? $quote->getAuthorNameEng() : $quote->getAuthorName(),
+                                        "title" => $lang == 'eng' ? $quote->getAuthorNameEng() : $lang == 'es' ? $quote->getAuthorNameEs() : $quote->getAuthorName(),
                                         // "subtitle" => $quote->title,
-                                        "body" => $lang == 'eng' ? $quote->text_short_eng : $quote->text_short
+                                        "body" => $lang == 'eng' ? $quote->text_short_eng : $lang == 'es' ? $quote->text_short_es : $quote->text_short
                                     ],
                                     "sound" => "default",
                                 ],
@@ -220,10 +233,10 @@ class PushController extends Controller
                                 'to' => $token->other,
                                 'data' => array(
                                     'body' => array(
-                                        'text' => $lang == 'eng' ? $quote->text_short_eng : $quote->text_short,
+                                        'text' => $lang == 'eng' ? $quote->text_short_eng : $lang == 'es' ? $quote->text_short_es : $quote->text_short,
                                         'q_id' => intval($quote->id),
                                     ),
-                                    'title' => $lang == 'eng' ? $quote->getAuthorNameEng() : $quote->getAuthorName(),
+                                    'title' => $lang == 'eng' ? $quote->getAuthorNameEng() : $lang == 'es' ? $quote->getAuthorNameEs() : $quote->getAuthorName(),
                                 )
                             ], JSON_UNESCAPED_UNICODE);
                             $ch = curl_init('https://fcm.googleapis.com/fcm/send');
@@ -288,7 +301,7 @@ class PushController extends Controller
                 // var_dump($data['PREVIEW_TEXT']);die();
                 // var_dump($_GET);
                 // echo 123;
-                $tokens = Token::find()->where(['version' => '2'])->andWhere(['<>', 'lang', 'eng'])->andWhere(['<>', 'lang', 'en'])->all();
+                $tokens = Token::find()->where(['version' => '2'])->andWhere(['<>', 'lang', 'eng'])->andWhere(['<>', 'lang', 'en'])->andWhere(['<>', 'lang', 'es'])->all();
                 // var_dump($tokens);die();
                 // $tokens = Token::find()->where(['id' => 299])->all();
                 

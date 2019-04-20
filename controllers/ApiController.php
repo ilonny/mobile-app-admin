@@ -192,6 +192,34 @@ class ApiController extends Controller
             // return JSON::encode($res, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE);
             return JSON::encode($res);
         }
+        if ($lang == 'es') {
+            if ($items == '[all]'){
+                $models = Quote::find()
+                    ->select(['id', 'title_es', 'text_short_es', 'text_es', 'item_id', 'date', 'img_src'])
+                    ->andWhere(['is not', 'title_es', NULL])
+                    ->andWhere(['<>', 'title_es', ''])
+                    ->orderBy('id DESC')
+                    ->all();
+            } else {
+                $req = JSON::decode($items);
+                $models = Quote::find()
+                    ->select(['id', 'title_es', 'text_short_es', 'text_es', 'item_id', 'date', 'img_src'])
+                    ->where(['in', 'item_id', $req])
+                    ->andWhere(['is not', 'title_es', NULL])
+                    ->andWhere(['<>', 'title_es', ''])
+                    ->orderBy('id DESC')
+                    ->all();
+            }
+            foreach ($models as $key => $model){
+                $res[$key]['id'] = $model->id;
+                $res[$key]['title'] = $model->title_es;
+                $res[$key]['text_short'] = $model->text_short_es;
+                $res[$key]['text'] = $model->text_es;
+                $res[$key]['author_name'] = $model->getAuthorNameEs();
+            }
+            // return JSON::encode($res, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE);
+            return JSON::encode($res);
+        }
     }
 
     public function actionFavorites($items, $lang = 'ru'){
@@ -214,6 +242,17 @@ class ApiController extends Controller
                 $res[$key]['title'] = $model->title_eng;
                 $res[$key]['text_short'] = $model->text_short_eng;
                 $res[$key]['author_name'] = $model->getAuthorNameEng();
+            }
+            return JSON::encode($res);
+        }
+        if ($lang == 'es') {
+            $req = JSON::decode($items);
+            $models = Quote::find()->where(['in', 'id', $req])->all();
+            foreach ($models as $key => $model){
+                $res[$key]['id'] = $model->id;
+                $res[$key]['title'] = $model->title_es;
+                $res[$key]['text_short'] = $model->text_short_es;
+                $res[$key]['author_name'] = $model->getAuthorNameEs();
             }
             return JSON::encode($res);
         }

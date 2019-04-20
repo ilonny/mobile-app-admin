@@ -38,10 +38,12 @@
                                     <td>
                                         <?= $quote->title; ?>
                                         <?= $quote->title_eng ? '<br>('.$quote->title_eng.')' : ''; ?>
+                                        <?= $quote->title_es ? '<br>('.$quote->title_es.')' : ''; ?>
                                     </td>
                                     <td>
                                         <?= $quote->getAuthorName(); ?>
                                         <br><?= $quote->getAuthorNameEng(); ?>
+                                        <br><?= $quote->getAuthorNameEs(); ?>
                                     </td>
                                     <td><?= $quote->getAuthorType(); ?></td>
                                     <td>
@@ -73,10 +75,13 @@
                     ]); ?>
                     <?= $form->field($model, 'title')->textInput()->label('Заголовок'); ?>
                     <?= $form->field($model, 'title_eng')->textInput()->label('Заголовок (на английском)'); ?>
+                    <?= $form->field($model, 'title_es')->textInput()->label('Заголовок (на испанском)'); ?>
                     <?= $form->field($model, 'text_short')->textInput()->label('Короткое описание (вступительный текст, превью цитаты)'); ?>
                     <?= $form->field($model, 'text_short_eng')->textInput()->label('Короткое описание на английском (вступительный текст, превью цитаты)'); ?>
+                    <?= $form->field($model, 'text_short_es')->textInput()->label('Короткое описание на испанском (вступительный текст, превью цитаты)'); ?>
                     <?= $form->field($model, 'text')->textarea(['rows' => '6', 'class' => 'gre'])->label('Текст статьи'); ?>
                     <?= $form->field($model, 'text_eng')->textarea(['rows' => '6', 'class' => 'gre'])->label('Текст статьи (на английском)'); ?>
+                    <?= $form->field($model, 'text_es')->textarea(['rows' => '6', 'class' => 'gre'])->label('Текст статьи (на испанском)'); ?>
                     <?php $items = ArrayHelper::map(Item::find()->all(), 'id', 'name'); ?>
                     <?= $form->field($model, 'item_id')->dropDownList($items)->label('Источник'); ?>
                     <?//= $form->field($model, 'item_type_id')->textInput(['type' => 'hidden', 'value' => $type == 'author' ? '1' : '2'])->label(false); ?>
@@ -89,3 +94,4 @@
         </div>
     </div>
 </div>
+<style>.select2-container{width: 90% !important;}</style>
