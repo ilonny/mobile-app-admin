@@ -360,7 +360,8 @@ class ApiController extends Controller
             }
             $response['books'] = $books_arr;
             return json_encode($response, JSON_UNESCAPED_UNICODE);
-        } else {
+        }
+        if ($lang == 'en' || $lang == 'eng') {
             $books = ReaderBook::find()
                 ->select(['id', 'name_eng', 'description_eng', 'reader_author_id', 'file_src_eng', 'other'])
                 ->andWhere(['is not', 'file_src_eng', NULL])
@@ -390,6 +391,36 @@ class ApiController extends Controller
             $response['books'] = $books_arr;
             return json_encode($response, JSON_UNESCAPED_UNICODE);
         }
+        if ($lang == 'es') {
+            $books = ReaderBook::find()
+                ->select(['id', 'name_es', 'description_es', 'reader_author_id', 'file_src_es', 'other'])
+                ->andWhere(['is not', 'file_src_es', NULL])
+                ->all();
+            $response = [];
+            $books_arr = [];
+            foreach ($books as $book){
+                $book_path = explode('.', $book->file_src_es);
+                $files=\yii\helpers\FileHelper::findFiles($book_path[0]);
+                $cover_src = "";
+                foreach ($files as $file){
+                    $file_ext = explode('.', $file);
+                    if ($file_ext[1] == 'jpg'){
+                        $cover_src = $file;
+                        break;
+                    }
+                }
+                array_push($books_arr, [
+                    'id' => $book->id,
+                    'name' => $book->name_es,
+                    'description' => $book->description_es,
+                    'author' => $book->readerAuthor->name_es,
+                    'file_src' => $book->file_src_es,
+                    'cover_src' => $cover_src,
+                ]);
+            }
+            $response['books'] = $books_arr;
+            return json_encode($response, JSON_UNESCAPED_UNICODE);
+        }
     }
 
     public function actionGetReaderBook($id, $lang = 'ru'){
@@ -409,6 +440,15 @@ class ApiController extends Controller
             }
             // file_put_contents('test.txt', 'accessed//', FILE_APPEND);
             return Yii::$app->response->sendFile("$book->file_src_eng", 'book.epub');
+            // return var_dump($book);
+        }
+        if ($lang == 'es') {
+            $book = ReaderBook::findOne($id);
+            if (!is_file("$book->file_src_es")) {
+                throw new \yii\web\NotFoundHttpException('The file does not exists.');
+            }
+            // file_put_contents('test.txt', 'accessed//', FILE_APPEND);
+            return Yii::$app->response->sendFile("$book->file_src_es", 'book.epub');
             // return var_dump($book);
         }
     }
@@ -440,6 +480,27 @@ class ApiController extends Controller
         }
         if ($lang == 'en' || $lang == 'eng') {
             $models = Toc::find()->andWhere(['book_id' => $book_id, 'other' => 'eng'])->all();
+            $arr = [];
+            foreach ($models as $model){
+                $audio_book_name = "";
+                if ($model->audio_book_id){
+                    $audioBook = AudioBook::findOne($model->audio_book_id);
+                    $audio_book_name = $audioBook->name;
+                }
+                array_push($arr, [
+                    'id' => $model->id,
+                    'app_href' => $model->app_href,
+                    'title' => $model->title,
+                    'book_id' => $model->book_id,
+                    'audio_book_id' => $model->audio_book_id,
+                    'audio_book_name' => $audio_book_name,
+                    'audiofile_id' => $model->audiofile_id,
+                    ]);
+            }
+            return json_encode($arr, JSON_UNESCAPED_UNICODE);
+        }
+        if ($lang == 'es') {
+            $models = Toc::find()->andWhere(['book_id' => $book_id, 'other' => 'es'])->all();
             $arr = [];
             foreach ($models as $model){
                 $audio_book_name = "";

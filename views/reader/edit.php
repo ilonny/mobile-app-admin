@@ -11,13 +11,16 @@ $this->registerJsFile('/js/book-edit.js', ['depends' => '\app\assets\AppAsset'])
 <h1>Редактирование книги id = <?=$model->id?></h1>
 <?= $form->field($model, 'name')->textInput()->label('Наименование'); ?>
 <?= $form->field($model, 'name_eng')->textInput()->label('Наименование на английском'); ?>
+<?= $form->field($model, 'name_es')->textInput()->label('Наименование на испанском'); ?>
 <?//= $form->field($model, 'item_type_id')->textInput(['type' => 'hidden', 'value' => $type == 'author' ? '1' : '2'])->label(false); ?>
 <?= $form->field($model, 'description')->textInput()->label('Короткое описание (не обязательно)'); ?>
 <?= $form->field($model, 'description_eng')->textInput()->label('Короткое описание на английском (не обязательно)'); ?>
+<?= $form->field($model, 'description_es')->textInput()->label('Короткое описание на испанском (не обязательно)'); ?>
 <?php $reader_authors = ArrayHelper::map(ReaderAuthor::find()->all(), 'id', 'name'); ?>
 <?= $form->field($model, 'reader_author_id')->dropDownList($reader_authors)->label('Автор'); ?>
 <?= $form->field($uploadModel, 'file')->fileInput()->label("Загрузить книгу (загруженный файл {$model->file_src})"); ?>
 <?= $form->field($uploadModel, 'file_eng')->fileInput()->label("Загрузить книгу английская версия (загруженный файл {$model->file_src_eng})"); ?>
+<?= $form->field($uploadModel, 'file_es')->fileInput()->label("Загрузить книгу английская версия (загруженный файл {$model->file_src_es})"); ?>
 <?php if ($model->tocs): ?>
     <hr>
     <h4>Главы книги (настройка связей с аудиофайлами, (для реализации перехода из ридера в аудио и обратно))</h4>
@@ -31,7 +34,8 @@ $this->registerJsFile('/js/book-edit.js', ['depends' => '\app\assets\AppAsset'])
             <tr>
                 <td>
                     <?= $toc->title; ?>
-                    <?= $toc->other ? '<br>English version' : ''?>
+                    <?= $toc->other == 'eng' ? '<br>English version' : ''?>
+                    <?= $toc->other == 'es' ? '<br>Espanol version' : ''?>
                 </td>
                 <td id="select-audio-book-<?=$toc->id?>">
                     <select name="audio_book_id" id="audio_book_id" data-toc-id="<?= $toc->id; ?>" class="form-control" style="display: inline-block; width: auto;">

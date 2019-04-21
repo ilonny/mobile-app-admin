@@ -16,6 +16,9 @@ use Yii;
  * @property string $name_eng
  * @property string $description_eng
  * @property string $file_src_eng
+ * @property string $name_es
+ * @property string $description_es
+ * @property string $file_src_es
  *
  * @property ReaderAuthor $readerAuthor
  * @property Toc[] $tocs
@@ -36,9 +39,9 @@ class ReaderBook extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['name', 'description', 'file_src', 'other', 'description_eng', 'file_src_eng'], 'string'],
+            [['name', 'description', 'file_src', 'other', 'description_eng', 'file_src_eng', 'description_es', 'file_src_es'], 'string'],
             [['reader_author_id'], 'integer'],
-            [['name_eng'], 'string', 'max' => 255],
+            [['name_eng', 'name_es'], 'string', 'max' => 255],
             [['reader_author_id'], 'exist', 'skipOnError' => true, 'targetClass' => ReaderAuthor::className(), 'targetAttribute' => ['reader_author_id' => 'id']],
         ];
     }
@@ -58,6 +61,9 @@ class ReaderBook extends \yii\db\ActiveRecord
             'name_eng' => 'Name Eng',
             'description_eng' => 'Description Eng',
             'file_src_eng' => 'File Src Eng',
+            'name_es' => 'Name Es',
+            'description_es' => 'Description Es',
+            'file_src_es' => 'File Src Es',
         ];
     }
 

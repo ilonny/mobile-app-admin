@@ -14,6 +14,7 @@ class UploadForm extends Model
      */
     public $file;
     public $file_eng;
+    public $file_es;
 
     /**
      * @return array the validation rules.
@@ -23,6 +24,7 @@ class UploadForm extends Model
         return [
             [['file'], 'file', 'maxSize' => 1024 * 1024 * 10],
             [['file_eng'], 'file', 'maxSize' => 1024 * 1024 * 10],
+            [['file_es'], 'file', 'maxSize' => 1024 * 1024 * 10],
         ];
     }
 }
