@@ -16,6 +16,9 @@ use Yii;
  * @property string $name_eng
  * @property string $description_eng
  * @property string $file_src_eng
+ * @property string $name_es
+ * @property string $description_es
+ * @property string $file_src_es
  *
  * @property AudioAuthor $audioAuthor
  * @property Audiofile[] $audiofiles
@@ -36,7 +39,7 @@ class AudioBook extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['name', 'description', 'file_src', 'other', 'name_eng', 'description_eng', 'file_src_eng'], 'string'],
+            [['name', 'description', 'file_src', 'other', 'name_eng', 'description_eng', 'file_src_eng', 'name_es', 'description_es', 'file_src_es'], 'string'],
             [['audio_author_id'], 'integer'],
             [['audio_author_id'], 'exist', 'skipOnError' => true, 'targetClass' => AudioAuthor::className(), 'targetAttribute' => ['audio_author_id' => 'id']],
         ];
@@ -57,6 +60,9 @@ class AudioBook extends \yii\db\ActiveRecord
             'name_eng' => 'Name Eng',
             'description_eng' => 'Description Eng',
             'file_src_eng' => 'File Src Eng',
+            'name_es' => 'Name Es',
+            'description_es' => 'Description Es',
+            'file_src_es' => 'File Src Es',
         ];
     }
 

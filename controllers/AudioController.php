@@ -120,9 +120,11 @@ class AudioController extends Controller
         }
         $audiofiles = Audiofile::find()->andWhere(['audio_book_id' => $book_id, 'other' => null])->orderBy('sort')->all();
         $audiofiles_eng = Audiofile::find()->andWhere(['audio_book_id' => $book_id, 'other' => 'eng'])->orderBy('sort')->all();
+        $audiofiles_es = Audiofile::find()->andWhere(['audio_book_id' => $book_id, 'other' => 'es'])->orderBy('sort')->all();
         return $this->renderAjax('render-audio-list', [
             'audiofiles' => $audiofiles,
             'audiofiles_eng' => $audiofiles_eng,
+            'audiofiles_es' => $audiofiles_es,
         ]);
     }
 
@@ -151,6 +153,9 @@ class AudioController extends Controller
             if ($form_data['language'] == '2') {
                 $model->other = 'eng';
             }
+            if ($form_data['language'] == '3') {
+                $model->other = 'es';
+            }
             if ($model->save()){
                 return json_encode(['status' => 200, 'message' => 'Успешно сохранено'], JSON_UNESCAPED_UNICODE);
             }
@@ -177,6 +182,8 @@ class AudioController extends Controller
         if ($toc->other == 'eng'){
             $audiofiles = Audiofile::find()->andWhere(['audio_book_id' => $book_id, 'other' => 'eng'])->orderBy('sort')->all();
             // var_dump($book_id);die();
+        } else if ($toc->other == 'es') {
+            $audiofiles = Audiofile::find()->andWhere(['audio_book_id' => $book_id, 'other' => 'es'])->orderBy('sort')->all();
         } else {
             $audiofiles = Audiofile::find()->andWhere(['audio_book_id' => $book_id, 'other' => null])->orderBy('sort')->all();
             // $audiofiles = $audioBook->audiofiles;

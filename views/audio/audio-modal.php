@@ -20,6 +20,7 @@
                 <select id="audiobook-language-modal" class="form-control" name="language">
                     <option value="1">Русский</option>
                     <option value="2">English</option>
+                    <option value="3">Espanol</option>
                 </select>
                 <div class="help-block"></div>
             </div>

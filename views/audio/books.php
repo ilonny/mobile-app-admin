@@ -38,14 +38,17 @@
                                         <td>
                                             <?= $model->name; ?>
                                             <?= $model->name_eng ? '<br>('.$model->name_eng.')' : ''; ?>
+                                            <?= $model->name_es ? '<br>('.$model->name_es.')' : ''; ?>
                                         </td>
                                         <td>
                                             <?= $model->description; ?>
                                             <?= $model->description_eng ? '<br>('.$model->description_eng.')' : ''; ?>
+                                            <?= $model->description_es ? '<br>('.$model->description_es.')' : ''; ?>
                                         </td>
                                         <td>
                                             <?= $model->audioAuthor->name; ?>
                                             <?= $model->audioAuthor->name_eng; ?>
+                                            <?= $model->audioAuthor->name_es; ?>
                                         </td>
                                         <td>
                                             <?= Html::beginForm(['/audio/delete', 'id' => $model->id], 'post'); ?>
@@ -70,8 +73,12 @@
                         $model = new AudioBook;
                     ?>
                     <?= $form->field($model, 'name')->textInput()->label('Наименование'); ?>
+                    <?= $form->field($model, 'name_eng')->textInput()->label('Наименование (на английском)'); ?>
+                    <?= $form->field($model, 'name_es')->textInput()->label('Наименование (на испанском)'); ?>
                     <?//= $form->field($model, 'item_type_id')->textInput(['type' => 'hidden', 'value' => $type == 'author' ? '1' : '2'])->label(false); ?>
                     <?= $form->field($model, 'description')->textInput()->label('Короткое описание (не обязательно)'); ?>
+                    <?= $form->field($model, 'description_eng')->textInput()->label('Короткое описание на английском (не обязательно)'); ?>
+                    <?= $form->field($model, 'description_es')->textInput()->label('Короткое описание на испанском (не обязательно)'); ?>
                     <?php $audio_authors = ArrayHelper::map(AudioAuthor::find()->all(), 'id', 'name');  ?>
                     <?= $form->field($model, 'audio_author_id')->dropDownList($audio_authors)->label('Автор'); ?>
                     <?//= $form->field($uploadModel, 'file')->fileInput()->label('Загрузить книгу'); ?>

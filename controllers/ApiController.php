@@ -623,6 +623,54 @@ class ApiController extends Controller
             }
             return json_encode($books_arr, JSON_UNESCAPED_UNICODE);
         }
+        if ($lang == 'es') {
+            $books = AudioBook::find()
+            ->select(['id', 'name_es', 'description_es', 'audio_author_id', 'file_src_es', 'other'])
+            // ->select(['id', 'name_es as name', 'description_es as description', 'audio_author_id', 'file_src_es as file_src', 'other'])
+            ->andWhere(['is not', 'name_es', NULL])
+            ->all();
+            $books_arr = [];
+            foreach ($books as $book){
+                $audiofiles = Audiofile::find()
+                    ->andWhere(['audio_book_id' => $book->id, 'other' => 'es'])
+                    ->orderBy('sort')
+                    ->all();
+                $audiofiles_arr = [];
+                foreach ($audiofiles as $audiofile){
+                    $toc_href = "";
+                    $reader_book_name = "";
+                    $reader_book_src = "";
+                    if ($audiofile->toc_id){
+                        $toc = Toc::findOne($audiofile->toc_id);
+                        $toc_href = $toc->app_href;
+                    }
+                    if ($audiofile->reader_book_id){
+                        $reader_book = ReaderBook::findOne($audiofile->reader_book_id);
+                        $reader_book_name = $reader_book->name_es;
+                        $reader_book_src = $reader_book->file_src_es;
+                    }
+                    array_push($audiofiles_arr, [
+                        'id' => $audiofile->id,
+                        'name' => $audiofile->name,
+                        'description' => $audiofile->description,
+                        'file_src' => $audiofile->file_src,
+                        'reader_book_id' => $audiofile->reader_book_id,
+                        'toc_id' => $audiofile->toc_id,
+                        'toc_href' => $toc_href,
+                        'reader_book_name' => $reader_book_name,
+                        'reader_book_src' => $reader_book_src,
+                    ]);
+                }
+                array_push($books_arr, [
+                    'id' => $book->id,
+                    'name' => $book->name_es,
+                    'description' => $book->description_es,
+                    'author' => $book->audioAuthor->name_es,
+                    'audiofiles' => $audiofiles_arr
+                ]);
+            }
+            return json_encode($books_arr, JSON_UNESCAPED_UNICODE);
+        }
     }
 
     public function actionGetAudioFiles($book_id, $lang = 'ru'){
@@ -680,6 +728,40 @@ class ApiController extends Controller
                     $reader_book = ReaderBook::findOne($book->reader_book_id);
                     $reader_book_name = $reader_book->name_eng;
                     $reader_book_src = $reader_book->file_src_eng;
+                }
+                array_push($books_arr, [
+                    'id' => $book->id,
+                    'name' => $book->name,
+                    'description' => $book->description,
+                    'file_src' => $book->file_src,
+                    'reader_book_id' => $book->reader_book_id,
+                    'toc_id' => $book->toc_id,
+                    'toc_href' => $toc_href,
+                    'reader_book_name' => $reader_book_name,
+                    'reader_book_src' => $reader_book_src,
+                ]);
+            }
+            return json_encode($books_arr, JSON_UNESCAPED_UNICODE);
+        }
+        if ($lang == 'es') {
+            $books = Audiofile::find()
+            // ->andWhere(['audio_book_id' => $book_id])->orderBy('sort')->all();
+                ->andWhere(['audio_book_id' => $book_id, 'other' => 'es'])
+                ->orderBy('sort')
+                ->all();
+            $books_arr = [];
+            foreach ($books as $book){
+                $toc_href = "";
+                $reader_book_name = "";
+                $reader_book_src = "";
+                if ($book->toc_id){
+                    $toc = Toc::findOne($book->toc_id);
+                    $toc_href = $toc->app_href;
+                }
+                if ($book->reader_book_id){
+                    $reader_book = ReaderBook::findOne($book->reader_book_id);
+                    $reader_book_name = $reader_book->name_es;
+                    $reader_book_src = $reader_book->file_src_es;
                 }
                 array_push($books_arr, [
                     'id' => $book->id,

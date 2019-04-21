@@ -26,6 +26,7 @@
                                 <span>
                                     <?= $model->name; ?>
                                     <?= $model->name_eng ? '<br>('.$model->name_eng.')' : ''; ?>
+                                    <?= $model->name_es ? '<br>('.$model->name_es.')' : ''; ?>
                                 </span>
                                 <?= Html::beginForm(['/audio/delete-author', 'id' => $model->id], 'post'); ?>
                                 <?= Html::submitButton(
@@ -47,6 +48,7 @@
                     ?>
                     <?= $form->field($model, 'name')->textInput()->label('Наименование'); ?>
                     <?= $form->field($model, 'name_eng')->textInput()->label('Наименование (на английском'); ?>
+                    <?= $form->field($model, 'name_es')->textInput()->label('Наименование (на испанском'); ?>
                     <?= $form->field($model, 'description')->textInput()->label('Короткое описание (не обязательно)'); ?>
                     <div class="form-group">
                         <?= Html::submitButton('Сохранить', ['class' => 'btn btn-primary']) ?>

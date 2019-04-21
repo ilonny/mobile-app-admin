@@ -20,7 +20,7 @@ $this->registerJsFile('/js/book-edit.js', ['depends' => '\app\assets\AppAsset'])
 <?= $form->field($model, 'reader_author_id')->dropDownList($reader_authors)->label('Автор'); ?>
 <?= $form->field($uploadModel, 'file')->fileInput()->label("Загрузить книгу (загруженный файл {$model->file_src})"); ?>
 <?= $form->field($uploadModel, 'file_eng')->fileInput()->label("Загрузить книгу английская версия (загруженный файл {$model->file_src_eng})"); ?>
-<?= $form->field($uploadModel, 'file_es')->fileInput()->label("Загрузить книгу английская версия (загруженный файл {$model->file_src_es})"); ?>
+<?= $form->field($uploadModel, 'file_es')->fileInput()->label("Загрузить книгу испанская версия (загруженный файл {$model->file_src_es})"); ?>
 <?php if ($model->tocs): ?>
     <hr>
     <h4>Главы книги (настройка связей с аудиофайлами, (для реализации перехода из ридера в аудио и обратно))</h4>
