@@ -144,11 +144,11 @@ class PushController extends Controller
                     ->all();
                 //возьмем из них рандомную
                 $rand_id = rand(0, count($quotes)-1);
+                $rand_id_eng = rand(0, count($quotes_eng)-1);
+                $rand_id_es = rand(0, count($quotes_es)-1);
                 if ($quotes[$rand_id]->text_short){
                     $random_quotes[] = $quotes[$rand_id];
                 }
-                $rand_id_eng = rand(0, count($quotes_eng)-1);
-                $rand_id_es = rand(0, count($quotes_es)-1);
                 if ($quotes_eng[$rand_id_eng]->text_short_eng){
                     $random_quotes_eng[] = $quotes_eng[$rand_id_eng];
                 }
@@ -156,7 +156,6 @@ class PushController extends Controller
                     $random_quotes_es[] = $quotes_es[$rand_id_es];
                 }
             }
-            
             //берем теперь все токены и прогоням их. отправляя пуш цитаты, если токен подписан на источник этой цитаты
             if ($offset == 0) {
                 $tokens = Token::find()->limit(10)->all();
@@ -164,6 +163,7 @@ class PushController extends Controller
             } else {
                 $tokens = Token::find()->offset($offset)->limit(10)->all();
             }
+            // $tokens = Token::find()->andWhere(['id' => 1074])->limit(1)->all();
             foreach ($tokens as $token){
                 //удалим кривые токены
                     //пока не воркает нормально
@@ -200,6 +200,24 @@ class PushController extends Controller
                         }
                     }
                     //если есть подписка на такой вид цитат, отправим пуш.
+                    switch ($lang) {
+                        case 'eng':
+                            $payload_title = $quote->getAuthorNameEng();
+                            $payload_body = $quote->text_short_eng;
+                            break;
+                        case 'ru':
+                            $payload_title = $quote->getAuthorName();
+                            $payload_body = $quote->text_short;
+                            break;
+                        case 'es':
+                            $payload_title = $quote->getAuthorNameEs();
+                            $payload_body = $quote->text_short_es;
+                            break;
+                        default:
+                            $payload_title = $quote->getAuthorName();
+                            $payload_body = $quote->text_short;
+                            break;
+                    }
                     if ($need_to_push){
                         //тут пойдет разделение на платформы
                         if ($token_platform == 'ios'){
@@ -207,9 +225,9 @@ class PushController extends Controller
                                 "quote_id" => $quote->id,
                                 "aps" => [
                                     "alert" => [
-                                        "title" => $lang == 'eng' ? $quote->getAuthorNameEng() : $lang == 'es' ? $quote->getAuthorNameEs() : $quote->getAuthorName(),
+                                        "title" => $payload_title,
                                         // "subtitle" => $quote->title,
-                                        "body" => $lang == 'eng' ? $quote->text_short_eng : $lang == 'es' ? $quote->text_short_es : $quote->text_short
+                                        "body" => $payload_body
                                     ],
                                     "sound" => "default",
                                 ],
@@ -233,10 +251,10 @@ class PushController extends Controller
                                 'to' => $token->other,
                                 'data' => array(
                                     'body' => array(
-                                        'text' => $lang == 'eng' ? $quote->text_short_eng : $lang == 'es' ? $quote->text_short_es : $quote->text_short,
+                                        'text' => $payload_body,
                                         'q_id' => intval($quote->id),
                                     ),
-                                    'title' => $lang == 'eng' ? $quote->getAuthorNameEng() : $lang == 'es' ? $quote->getAuthorNameEs() : $quote->getAuthorName(),
+                                    'title' => $payload_title,
                                 )
                             ], JSON_UNESCAPED_UNICODE);
                             $ch = curl_init('https://fcm.googleapis.com/fcm/send');

@@ -88,7 +88,7 @@ class ApiController extends Controller
             $return['books'] = $books;
             return Json::encode($return);
         }
-        if ($lang == 'en') {
+        if ($lang == 'en' || $lang == 'eng') {
             $models = Item::find()
                 ->select(['id', 'name_eng as name', 'item_type_id', 'description_eng as description'])
                 ->andWhere(['is not', 'name_eng', NULL])
