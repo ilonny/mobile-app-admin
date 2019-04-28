@@ -83,7 +83,7 @@
                     <?= $form->field($model, 'reader_author_id')->dropDownList($reader_authors)->label('Автор'); ?>
                     <?= $form->field($uploadModel, 'file')->fileInput()->label('Загрузить книгу'); ?>
                     <?= $form->field($uploadModel, 'file_eng')->fileInput()->label("Загрузить книгу английская версия (загруженный файл {$model->file_src_eng})"); ?>
-                    <?= $form->field($uploadModel, 'file_es')->fileInput()->label("Загрузить книгу английская версия (загруженный файл {$model->file_src_es})"); ?>
+                    <?= $form->field($uploadModel, 'file_es')->fileInput()->label("Загрузить книгу испанская версия (загруженный файл {$model->file_src_es})"); ?>
                     <div class="form-group">
                         <?= Html::submitButton('Сохранить', ['class' => 'btn btn-primary']) ?>
                     </div>
