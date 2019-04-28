@@ -163,7 +163,7 @@ class PushController extends Controller
             } else {
                 $tokens = Token::find()->offset($offset)->limit(10)->all();
             }
-            // $tokens = Token::find()->andWhere(['id' => 1074])->limit(1)->all();
+            // $tokens = Token::find()->andWhere(['id' => 1178])->limit(1)->all();
             foreach ($tokens as $token){
                 //удалим кривые токены
                     //пока не воркает нормально
@@ -249,6 +249,7 @@ class PushController extends Controller
                         } else {
                             $android_push_body = json_encode([
                                 'to' => $token->other,
+                                "priority" => "high",
                                 'data' => array(
                                     'body' => array(
                                         'text' => $payload_body,
@@ -267,10 +268,21 @@ class PushController extends Controller
                             ));
                             $response = curl_exec($ch);
                             $response = json_decode($response, true);
-                            // if ($response['failure']){
-                            //     $token->delete();
-                            //     continue 2;
-                            // }
+                            try {
+                                if ($response['failure']){
+                                    // if ($token->error == null) {
+                                    //     $token->error  = '1';
+                                    // } else {
+                                    //     $token->error = strval($token->error+1);
+                                    // }
+                                    $token->error = json_encode($response);
+                                    $token->update();
+                                    // continue 2;
+                                } else {
+                                    $token->error = '';
+                                    $token->update();
+                                }
+                            } catch (Exception $e) {}
                         }
                     }
                 }
