@@ -42,6 +42,9 @@ class ReaderController extends Controller
     }
 
     public function actionBooks(){
+        set_time_limit(300);
+        ini_set('max_execution_time', 300);
+        ini_set('post_max_size', "100M");
         if (Yii::$app->user->isGuest) {
             Yii::$app->user->loginRequired();
         }
@@ -110,6 +113,27 @@ class ReaderController extends Controller
                         $toc_model->title = $toc->navLabel->text->__toString();
                         $toc_model->book_id = $model->id;
                         $toc_model->save();
+                        try {
+                            foreach ($toc->{"navPoint"} as $toc_inner) {
+                                // var_dump($toc_inner);die();
+                                $toc_model = new Toc();
+                                $toc_model->app_href = $toc_inner->content['src']->__toString();
+                                $toc_model->title = $toc_inner->navLabel->text->__toString();
+                                $toc_model->book_id = $model->id;
+                                $toc_model->save();
+                                try {
+                                    foreach ($toc_inner->{"navPoint"} as $toc_inner2) {
+                                        $toc_model = new Toc();
+                                        $toc_model->app_href = $toc_inner2->content['src']->__toString();
+                                        $toc_model->title = $toc_inner2->navLabel->text->__toString();
+                                        $toc_model->book_id = $model->id;
+                                        $toc_model->save();
+                                    }
+                                } catch (Exception $e){
+                                }
+                            }
+                        } catch (Exception $e){
+                        }
                     }
                 }
                 ///////
@@ -142,6 +166,18 @@ class ReaderController extends Controller
                         $toc_model->book_id = $model->id;
                         $toc_model->other = 'eng';
                         $toc_model->save();
+                        try {
+                            foreach ($toc->{"navPoint"} as $toc_inner) {
+                                var_dump($toc_inner);die();
+                                $toc_model = new Toc();
+                                $toc_model->app_href = $toc_inner->content['src']->__toString();
+                                $toc_model->title = $toc_inner->navLabel->text->__toString();
+                                $toc_model->book_id = $model->id;
+                                $toc_model->other = 'eng';
+                                $toc_model->save();
+                            }
+                        } catch (Exception $e){
+                        }
                     }
                 }
                 //
@@ -182,6 +218,9 @@ class ReaderController extends Controller
     }
 
     public function actionEdit($id){
+        set_time_limit(300);
+        ini_set('max_execution_time', 300);
+        ini_set('post_max_size', "100M");
         if (Yii::$app->user->isGuest) {
             Yii::$app->user->loginRequired();
         }

@@ -193,7 +193,5 @@ img.wp-smiley{border:none !important;box-shadow:none !important;height:1em !impo
   crossorigin="anonymous"></script>
 <script>
 $(document).ready(function(){
-    $('iframe').closest('.wpcnt').remove();
-    $('iframe').remove();
 });
 </script>

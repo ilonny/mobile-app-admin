@@ -164,6 +164,8 @@ class PushController extends Controller
                 $tokens = Token::find()->offset($offset)->limit(10)->all();
             }
             // $tokens = Token::find()->andWhere(['id' => 1178])->limit(1)->all();
+            // $tokens = Token::find()->andWhere(['id' => 1172])->limit(1)->all();
+            // $tokens = Token::find()->andWhere(['id' => 1079])->limit(1)->all();
             foreach ($tokens as $token){
                 //удалим кривые токены
                     //пока не воркает нормально
@@ -233,7 +235,7 @@ class PushController extends Controller
                                 ],
                             ], JSON_UNESCAPED_UNICODE);
                             $device = $token->other;
-                            $curl_query = "curl -d '${payload}' --cert /var/www/flames_user/data/www/mobile-app.flamesclient.ru/web/apns-prod.pem:Rh3xwaex9g -H \"apns-topic: org.reactjs.native.example.GuruOnline\" --http2  https://api.push.apple.com/3/device/${device}";
+                            $curl_query = "curl -d '${payload}' --cert /var/www/www-root/data/www/app.harekrishna.ru/web/apns-prod.pem:Rh3xwaex9g -H \"apns-topic: org.reactjs.native.example.GuruOnline\" --http2  https://api.push.apple.com/3/device/${device}";
                             $curl_result = shell_exec($curl_query);
                             // var_dump($curl_query);
                             // var_dump($curl_result);
@@ -307,6 +309,8 @@ class PushController extends Controller
 
     public function actionBitrixPush(){
         //
+        set_time_limit(1200);
+        ini_set("max_execution_time", "1200");  
         $types = ['content', 'read', 'look', 'listen', 'important', 'news'];
         
         foreach ($types as $key => $type) :
@@ -333,7 +337,12 @@ class PushController extends Controller
                 // echo 123;
                 $tokens = Token::find()->where(['version' => '2'])->andWhere(['<>', 'lang', 'eng'])->andWhere(['<>', 'lang', 'en'])->andWhere(['<>', 'lang', 'es'])->all();
                 // var_dump($tokens);die();
-                // $tokens = Token::find()->where(['id' => 299])->all();
+                // $tokens = Token::find()->where(['id' => 1233])->all();
+                // $tokens = Token::find()->where(['id' => 1079])->all();
+                // sleep(600);
+                // for ($i = 1; $i<=100; $i++) {
+                //     $tokens[] = $tokens[0];
+                // }
                 
                 foreach ($tokens as $key => $token) {
                     
@@ -370,9 +379,11 @@ class PushController extends Controller
                             $need_push = false;
                             break;
                     }
+
                     if (!$data['ID'] || !$data['NAME'] || !$model->id){
                         $need_push = false;
                     }
+                    // var_dump($data);die();
                     if ($need_push){
                         if (json_decode($token->token)->os == 'ios'){
                             $token_platform = 'ios';
@@ -394,13 +405,16 @@ class PushController extends Controller
                             ], JSON_UNESCAPED_UNICODE);
                             // echo $payload; die();
                             $device = $token->other;
-                            $curl_query = "curl -d '${payload}' --cert /var/www/flames_user/data/www/mobile-app.flamesclient.ru/web/apns-prod.pem:Rh3xwaex9g -H \"apns-topic: org.reactjs.native.example.GuruOnline\" --http2  https://api.push.apple.com/3/device/${device}";
-                            // $curl_query = "curl -d '${payload}' --cert /var/www/flames_user/data/www/mobile-app.flamesclient.ru/web/apns-dev.pem:Rh3xwaex9g -H \"apns-topic: org.reactjs.native.example.GuruOnline\" --http2  https://api.push.apple.com/3/device/${device}";
+                            $curl_query = "curl -d '${payload}' --cert /var/www/www-root/data/www/app.harekrishna.ru/web/apns-prod.pem:Rh3xwaex9g -H \"apns-topic: org.reactjs.native.example.GuruOnline\" --http2  https://api.push.apple.com/3/device/${device}";
+                            // $curl_query = "curl -d '${payload}' --cert /var/www/www-root/data/www/app.harekrishna.ru/web/apns-dev.pem:Rh3xwaex9g -H \"apns-topic: org.reactjs.native.example.GuruOnline\" --http2  https://api.push.apple.com/3/device/${device}";
                             $curl_result = shell_exec($curl_query);
+                            // var_dump($curl_query);
                             // var_dump($curl_result);
+                            // die();
                         } else {
                             $android_push_body = json_encode([
                                 'to' => $token->other,
+                                "priority" => "high",
                                 'data' => array(
                                     'body' => array(
                                         'text' => $data['PREVIEW_TEXT'],

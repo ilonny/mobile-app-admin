@@ -145,6 +145,7 @@ class ApiController extends Controller
                     ->andWhere(['is not', 'title', NULL])
                     ->andWhere(['<>', 'title', ''])
                     ->orderBy('id DESC')->all();
+                // var_dump($models[0]); die();
             } else {
                 $req = JSON::decode($items);
                 $models = Quote::find()
@@ -282,6 +283,9 @@ class ApiController extends Controller
         //     $news_settings = '["content","read","look","listen","important"]';
         // }
         //safe or update
+        $token = urldecode($token);
+        $settings = urldecode($settings);
+        $news_settings = urldecode($news_settings);
         $token_clear = json_decode($token);
         $token_clear = $token_clear->token;
         if (!$token_clear){

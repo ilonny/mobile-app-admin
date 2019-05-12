@@ -13,6 +13,19 @@
     </div>
     <div class="row">
         <div class="col-xs-12">
+            <div class="form-group">
+                <label>Выберите источник</label>
+                <select id="change_author">
+                    <option value="0">Все</option>
+                    <?php foreach ($items as $key => $item): ?>
+                        <option <?= $_GET['item_id'] == $item->id ? 'selected' : ''; ?> value="<?= $item->id; ?>"><?= $item->name; ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
             <ul class="nav nav-tabs">
                 <li class="active">
                     <a data-toggle="tab" href="#list">Список</a>
@@ -26,6 +39,7 @@
                     <table class="table table-striped table-bordered" id="data-table" style="margin: 30px 0;">
                         <thead>
                             <tr>
+                                <th>ID</th>
                                 <th>Заголовок</th>
                                 <th>Источник</th>
                                 <th>Тип источника</th>
@@ -35,6 +49,7 @@
                         <tbody>
                             <?php foreach ($quotes as $quote): ?>
                                 <tr>
+                                    <td><?= $quote->id; ?></td>
                                     <td>
                                         <?= $quote->title; ?>
                                         <?= $quote->title_eng ? '<br>('.$quote->title_eng.')' : ''; ?>

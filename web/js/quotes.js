@@ -3,10 +3,20 @@ $('textarea').gre({
     height: 250
 });
 $("#quote-item_id").select2();
-
+$("#change_author").select2();
+$(document).on('change', '#change_author', function () {
+  var val = $(this).val();
+  console.log('val', val);
+  if (val != 0) {
+    document.location.replace('https://app.harekrishna.ru/site/quotes?item_id='+val)
+  } else {
+    document.location.replace('https://app.harekrishna.ru/site/quotes');
+  }
+})
 $(".image-uploader").imageUploader();
 
 $("#data-table").DataTable({
+    order: [[0, 'desc']],
     "language":
     {
         "processing": "Подождите...",

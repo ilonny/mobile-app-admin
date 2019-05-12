@@ -69,6 +69,7 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
+        // phpinfo();die();
         return $this->render('index');
     }
 
@@ -173,7 +174,11 @@ class SiteController extends Controller
     
     
     public function actionQuotes(){
-        $quotes = Quote::find()->all();
+        if ($_GET['item_id']) {
+            $quotes = Quote::find()->andWhere(['item_id' => $_GET['item_id']])->orderBy('id DESC')->all();
+        } else {
+            $quotes = Quote::find()->orderBy('id DESC')->all();
+        }
         $items = Item::find()->all();
         Yii::$app->params['uploadPath'] = Yii::$app->basePath . '/web/uploads/';
         if (Yii::$app->user->isGuest) {
