@@ -175,6 +175,17 @@ class ReaderController extends Controller
                                 $toc_model->book_id = $model->id;
                                 $toc_model->other = 'eng';
                                 $toc_model->save();
+                                try {
+                                    foreach ($toc_inner->{"navPoint"} as $toc_inner2) {
+                                        $toc_model = new Toc();
+                                        $toc_model->app_href = $toc_inner2->content['src']->__toString();
+                                        $toc_model->title = $toc_inner2->navLabel->text->__toString();
+                                        $toc_model->book_id = $model->id;
+                                        $toc_model->other = 'eng';
+                                        $toc_model->save();
+                                    }
+                                } catch (Exception $e){
+                                }
                             }
                         } catch (Exception $e){
                         }
@@ -204,6 +215,29 @@ class ReaderController extends Controller
                         $toc_model->book_id = $model->id;
                         $toc_model->other = 'es';
                         $toc_model->save();
+                        try {
+                            foreach ($toc->{"navPoint"} as $toc_inner) {
+                                // var_dump($toc_inner);die();
+                                $toc_model = new Toc();
+                                $toc_model->app_href = $toc_inner->content['src']->__toString();
+                                $toc_model->title = $toc_inner->navLabel->text->__toString();
+                                $toc_model->book_id = $model->id;
+                                $toc_model->other = 'es';
+                                $toc_model->save();
+                                try {
+                                    foreach ($toc_inner->{"navPoint"} as $toc_inner2) {
+                                        $toc_model = new Toc();
+                                        $toc_model->app_href = $toc_inner2->content['src']->__toString();
+                                        $toc_model->title = $toc_inner2->navLabel->text->__toString();
+                                        $toc_model->book_id = $model->id;
+                                        $toc_model->other = 'es';
+                                        $toc_model->save();
+                                    }
+                                } catch (Exception $e){
+                                }
+                            }
+                        } catch (Exception $e){
+                        }
                     }
                 }
                 //
@@ -295,6 +329,27 @@ class ReaderController extends Controller
                             $toc_model->title = $toc->navLabel->text->__toString();
                             $toc_model->book_id = $model->id;
                             $toc_model->save();
+                            try {
+                                foreach ($toc->{"navPoint"} as $toc_inner) {
+                                    // var_dump($toc_inner);die();
+                                    $toc_model = new Toc();
+                                    $toc_model->app_href = $toc_inner->content['src']->__toString();
+                                    $toc_model->title = $toc_inner->navLabel->text->__toString();
+                                    $toc_model->book_id = $model->id;
+                                    $toc_model->save();
+                                    try {
+                                        foreach ($toc_inner->{"navPoint"} as $toc_inner2) {
+                                            $toc_model = new Toc();
+                                            $toc_model->app_href = $toc_inner2->content['src']->__toString();
+                                            $toc_model->title = $toc_inner2->navLabel->text->__toString();
+                                            $toc_model->book_id = $model->id;
+                                            $toc_model->save();
+                                        }
+                                    } catch (Exception $e){
+                                    }
+                                }
+                            } catch (Exception $e){
+                            }
                         }
                     }
                     if ($uploadModelEng->file) {
@@ -326,6 +381,29 @@ class ReaderController extends Controller
                             $toc_model->title = $toc->navLabel->text->__toString();
                             $toc_model->book_id = $model->id;
                             $toc_model->other = 'eng';
+                            try {
+                                foreach ($toc->{"navPoint"} as $toc_inner) {
+                                    // var_dump($toc_inner);die();
+                                    $toc_model = new Toc();
+                                    $toc_model->app_href = $toc_inner->content['src']->__toString();
+                                    $toc_model->title = $toc_inner->navLabel->text->__toString();
+                                    $toc_model->book_id = $model->id;
+                                    $toc_model->other = 'eng';
+                                    $toc_model->save();
+                                    try {
+                                        foreach ($toc_inner->{"navPoint"} as $toc_inner2) {
+                                            $toc_model = new Toc();
+                                            $toc_model->app_href = $toc_inner2->content['src']->__toString();
+                                            $toc_model->title = $toc_inner2->navLabel->text->__toString();
+                                            $toc_model->book_id = $model->id;
+                                            $toc_model->other = 'eng';
+                                            $toc_model->save();
+                                        }
+                                    } catch (Exception $e){
+                                    }
+                                }
+                            } catch (Exception $e){
+                            }
                             $toc_model->save();
                         }
                     }
@@ -359,6 +437,29 @@ class ReaderController extends Controller
                             $toc_model->book_id = $model->id;
                             $toc_model->other = 'es';
                             $toc_model->save();
+                            try {
+                                foreach ($toc->{"navPoint"} as $toc_inner) {
+                                    // var_dump($toc_inner);die();
+                                    $toc_model = new Toc();
+                                    $toc_model->app_href = $toc_inner->content['src']->__toString();
+                                    $toc_model->title = $toc_inner->navLabel->text->__toString();
+                                    $toc_model->book_id = $model->id;
+                                    $toc_model->other = 'es';
+                                    $toc_model->save();
+                                    try {
+                                        foreach ($toc_inner->{"navPoint"} as $toc_inner2) {
+                                            $toc_model = new Toc();
+                                            $toc_model->app_href = $toc_inner2->content['src']->__toString();
+                                            $toc_model->title = $toc_inner2->navLabel->text->__toString();
+                                            $toc_model->book_id = $model->id;
+                                            $toc_model->other = 'es';
+                                            $toc_model->save();
+                                        }
+                                    } catch (Exception $e){
+                                    }
+                                }
+                            } catch (Exception $e){
+                            }
                         }
                     }
                 //
