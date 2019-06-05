@@ -836,4 +836,8 @@ class ApiController extends Controller
         $toc->update();
         $audiofile->update();
     }
+
+    public function actionSetEcadashCity() {
+        file_put_contents('log.txt', $_GET['token'].' '.$_GET['city']);
+    }
 }

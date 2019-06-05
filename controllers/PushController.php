@@ -450,6 +450,126 @@ class PushController extends Controller
     }
         // var_dump($token_platform);die();
         
+    public function actionDailyEcadash() {
+        $type = $_GET['type']; //today or tomorrow
+        $cities_shedule = [];
+        set_time_limit(1200);
+        ini_set("max_execution_time", "1200");
+        $tokens = Token::find()->andWhere(['version' => 3])->all();
+        // $tokens = Token::find()->andWhere(['id' => 1376])->all();
+        foreach ($tokens as $key => $token) {
+            if (json_decode($token->token)->os == 'ios'){
+                $token_platform = 'ios';
+            } else {
+                $token_platform = 'android';
+            }
+            if ($token->city) {
+                $token_city = $token->city;
+            } else {
+                $token_city = 'moscow';
+            }
+            if ($token->lang == 'eng' || $token->lang == 'en') {
+                $lang = 'en';
+            } else {
+                $lang = 'ru';
+            }
 
+            if (!$cities_shedule[$token_city][$lang]) {
+                if($curl = curl_init()) {
+                    curl_setopt($curl, CURLOPT_URL, 'http://vaishnavacalendar.org/json/'.$token_city.'/534/'.$lang);
+                    curl_setopt($curl, CURLOPT_RETURNTRANSFER,true);
+                    $out = curl_exec($curl);
+                    $cities_shedule[$token_city][$lang] = json_decode($out, JSON_UNESCAPED_UNICODE);
+                    curl_close($curl);
+                }
+            }
+            $shedule = $cities_shedule[$token_city][$lang];
+            // echo '<pre>';
+            // var_dump($cities_shedule);
+            // die();
+            // echo '</pre>';
+            $today = date('Y-m-d');
+            $tomorrow = new \DateTime();
+            $tomorrow->modify('+1 day');
+            $tomorrow->format('Y-m-d');
+
+            $today = '2019-06-07';
+            $tomorrow = '2019-06-07';
+
+            $shedule_item = false;
+            foreach ($shedule as $key_s => $shedule_item_s) {
+                if ($type == 'today') {
+                    if ($shedule_item_s['date'] == $today) {
+                        $shedule_item = $shedule_item_s;
+                    }
+                } else {
+                    if ($shedule_item_s['date'] == $tomorrow) {
+                        $shedule_item = $shedule_item_s;
+                    }
+                }
+            }
+
+            if ($shedule_item) {
+                $payload_title = ($type == 'today' ? ($lang == 'ru' ? 'Сегодня: ' : 'Today: ').date('d.m.Y') : ($lang == 'ru' ? 'Завтра ' : 'Tomorrow ').'('.date('d.m.Y', strtotime($tomorrow)).')');
+                $payload_body = $shedule_item['festivals_str'].' '.$shedule_item['holy_days_str'];
+
+                if ($token_platform == 'ios'){
+                    $payload = json_encode([
+                        "aps" => [
+                            "alert" => [
+                                "title" => $payload_title,
+                                // "subtitle" => $quote->title,
+                                "body" => $payload_body
+                            ],
+                            "sound" => "default",
+                        ],
+                    ], JSON_UNESCAPED_UNICODE);
+                    $device = $token->other;
+                    $curl_query = "curl -d '${payload}' --cert /var/www/www-root/data/www/app.harekrishna.ru/web/apns-prod.pem:Rh3xwaex9g -H \"apns-topic: org.reactjs.native.example.GuruOnline\" --http2  https://api.push.apple.com/3/device/${device}";
+                    $curl_result = shell_exec($curl_query);
+                    // var_dump($curl_query);
+                    // var_dump($curl_result);
+                    // die();
+                } else {
+                    $android_push_body = json_encode([
+                        'to' => $token->other,
+                        "priority" => "high",
+                        'data' => array(
+                            'body' => array(
+                                'text' => $payload_body,
+                            ),
+                            'title' => $payload_title,
+                        )
+                    ], JSON_UNESCAPED_UNICODE);
+                    $ch = curl_init('https://fcm.googleapis.com/fcm/send');
+                    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+                    curl_setopt($ch, CURLOPT_POSTFIELDS, $android_push_body);
+                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                    curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+                        'Content-Type: application/json',
+                        'Authorization: key=AAAAmLg0GRc:APA91bGaOgw6-8zB6Q_o7A-Qf5BU7ofEQqM5UoMAgIySYgcFQ3aS1z9V9W-Wk9Xa9qRrqaQ47qfo7tzAi4uY-4IzgAPpesbwVOYZQ4QX94VFCQvGLpSS4qaOwJpritlwf-n7BWsvH5jO9sKZAyA56vdcL1Gt1mlKtg'
+                    ));
+                    $response = curl_exec($ch);
+                    $response = json_decode($response, true);
+                    try {
+                        if ($response['failure']){
+                            // if ($token->error == null) {
+                            //     $token->error  = '1';
+                            // } else {
+                            //     $token->error = strval($token->error+1);
+                            // }
+                            $token->error = json_encode($response);
+                            $token->update();
+                            // continue 2;
+                        } else {
+                            $token->error = '';
+                            $token->update();
+                        }
+                    } catch (Exception $e) {}
+                }
+            }
+        }
+        // var_dump($cities_shedule);die();
+    }
         // $data = $_GET['data'];
 }
