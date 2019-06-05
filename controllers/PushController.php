@@ -493,8 +493,8 @@ class PushController extends Controller
             $tomorrow->modify('+1 day');
             $tomorrow->format('Y-m-d');
 
-            $today = '2019-06-07';
-            $tomorrow = '2019-06-07';
+            // $today = '2019-06-07';
+            // $tomorrow = '2019-06-07';
 
             $shedule_item = false;
             foreach ($shedule as $key_s => $shedule_item_s) {
