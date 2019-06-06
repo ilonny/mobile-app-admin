@@ -491,8 +491,7 @@ class PushController extends Controller
             $today = date('Y-m-d');
             $tomorrow = new \DateTime();
             $tomorrow->modify('+1 day');
-            $tomorrow->format('Y-m-d');
-
+            $tomorrow = $tomorrow->format('Y-m-d');
             // $today = '2019-06-07';
             // $tomorrow = '2019-06-07';
 
@@ -508,7 +507,8 @@ class PushController extends Controller
                     }
                 }
             }
-
+            // var_dump($tomorrow);die();
+            // var_dump($shedule);die();
             if ($shedule_item) {
                 $payload_title = ($type == 'today' ? ($lang == 'ru' ? 'Сегодня: ' : 'Today: ').date('d.m.Y') : ($lang == 'ru' ? 'Завтра ' : 'Tomorrow ').'('.date('d.m.Y', strtotime($tomorrow)).')');
                 $payload_body = $shedule_item['festivals_str'].' '.$shedule_item['holy_days_str'];
