@@ -452,6 +452,7 @@ class PushController extends Controller
         
     public function actionDailyEcadash() {
         $type = $_GET['type']; //today or tomorrow
+        $today_date = 
         $cities_shedule = [];
         set_time_limit(1200);
         ini_set("max_execution_time", "1200");
@@ -492,6 +493,15 @@ class PushController extends Controller
             $tomorrow = new \DateTime();
             $tomorrow->modify('+1 day');
             $tomorrow = $tomorrow->format('Y-m-d');
+            if ($_GET['date']) {
+                if ($type == 'today') {
+                    $today = $_GET['date'];
+                } else {
+                    $tomorrow = new \DateTime($_GET['date']);
+                    $tomorrow->modify('+1 day');
+                    $tomorrow = $tomorrow->format('Y-m-d');
+                }
+            }
             // $today = '2019-06-07';
             // $tomorrow = '2019-06-07';
 
@@ -510,9 +520,10 @@ class PushController extends Controller
             // var_dump($tomorrow);die();
             // var_dump($shedule);die();
             if ($shedule_item) {
-                $payload_title = ($type == 'today' ? ($lang == 'ru' ? 'Сегодня: ' : 'Today: ').date('d.m.Y') : ($lang == 'ru' ? 'Завтра ' : 'Tomorrow ').'('.date('d.m.Y', strtotime($tomorrow)).')');
-                $payload_body = $shedule_item['festivals_str'].' '.$shedule_item['holy_days_str'];
-
+                $payload_title = ($type == 'today' ? ($lang == 'ru' ? 'Сегодня: ' : 'Today: ').date('d.m.Y', strtotime($shedule_item['date'])) : ($lang == 'ru' ? 'Завтра ' : 'Tomorrow ').'('.date('d.m.Y', strtotime($tomorrow)).')');
+                $payload_body = (($shedule_item['festivals_str'] || $shedule_item['holy_days_str']) ? $shedule_item['festivals_str'].' '.$shedule_item['holy_days_str'] : ($shedule_item['shv_str'] ? $shedule_item['shv_str'] : ''));
+                $payload_title = strip_tags($payload_title);
+                $payload_body = strip_tags($payload_body);
                 if ($token_platform == 'ios'){
                     $payload = json_encode([
                         "aps" => [
