@@ -458,6 +458,7 @@ class PushController extends Controller
         ini_set("max_execution_time", "1200");
         $tokens = Token::find()->andWhere(['version' => 3])->all();
         // $tokens = Token::find()->andWhere(['id' => 1376])->all();
+        // $tokens = Token::find()->andWhere(['id' => 1316])->all();
         foreach ($tokens as $key => $token) {
             if (json_decode($token->token)->os == 'ios'){
                 $token_platform = 'ios';

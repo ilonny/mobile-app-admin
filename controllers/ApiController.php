@@ -847,4 +847,37 @@ class ApiController extends Controller
             echo 'token not found';
         }
     }
+    public function actionGetEcadashCalendar($city = 'moscow', $lang = 'ru') {
+        if($curl = curl_init()) {
+            curl_setopt($curl, CURLOPT_URL, 'http://vaishnavacalendar.org/json/'.$city.'/534/'.$lang);
+            curl_setopt($curl, CURLOPT_RETURNTRANSFER,true);
+            $items = curl_exec($curl);
+            curl_close($curl);
+        }
+        if ($items) {
+            $items_arr = json_decode($items, true);
+            // echo json_encode($items, JSON_UNESCAPED_UNICODE);
+            // echo '<pre>';
+            // var_dump($items_arr);
+            // echo '/<pre>';
+            $result = [];
+            foreach ($items_arr as $key => $item) {
+                array_push($result, [
+                    'date' => strip_tags($item['date']),
+                    'date_format' => date('d.m.Y', strtotime(strip_tags($item['date']))),
+                    'display_sun_month' => strip_tags($item['display_sun_month']),
+                    'display_moon_month' => strip_tags($item['display_moon_month']),
+                    'festivals_str' => strip_tags($item['festivals_str']),
+                    'holy_days_str' => strip_tags($item['holy_days_str']),
+                    'notes' => strip_tags($item['notes']),
+                    'shv_str' => strip_tags($item['shv_str']),
+                    'notes_str' => strip_tags($item['notes_str']),
+                    'weekday_str' => strip_tags($item['weekday_str']),
+                    'tithi_str' => strip_tags($item['tithi_str']),
+                ]);
+            }
+            echo json_encode($result, JSON_UNESCAPED_UNICODE);
+            die();
+        }
+    }
 }
