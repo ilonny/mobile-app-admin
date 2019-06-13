@@ -838,6 +838,13 @@ class ApiController extends Controller
     }
 
     public function actionSetEcadashCity() {
-        file_put_contents('log.txt', $_GET['token'].' '.$_GET['city']);
+        $token = Token::find()->where(['token' => $_GET['token']])->one();
+        if ($token) {
+            $token->city = $_GET['city'];
+            $token->update();
+            echo 'success';
+        } else {
+            echo 'token not found';
+        }
     }
 }
