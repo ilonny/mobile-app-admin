@@ -838,7 +838,10 @@ class ApiController extends Controller
     }
 
     public function actionSetEcadashCity() {
-        $token = Token::find()->where(['token' => $_GET['token']])->one();
+        $token = Token::find()->where(['like', 'token', $_GET['token']])->one();
+        if (!$token) {
+            $token = Token::find()->where(['token' => $_GET['token']])->one();
+        }
         if ($token) {
             $token->city = $_GET['city'];
             $token->update();
