@@ -165,7 +165,7 @@ class PushController extends Controller
             }
             // $tokens = Token::find()->andWhere(['id' => 1178])->limit(1)->all();
             // $tokens = Token::find()->andWhere(['id' => 1172])->limit(1)->all();
-            // $tokens = Token::find()->andWhere(['id' => 1079])->limit(1)->all();
+            // $tokens = Token::find()->andWhere(['id' => 1453])->limit(1)->all();
             foreach ($tokens as $token){
                 //удалим кривые токены
                     //пока не воркает нормально
@@ -335,9 +335,9 @@ class PushController extends Controller
                 // var_dump($data['PREVIEW_TEXT']);die();
                 // var_dump($_GET);
                 // echo 123;
-                $tokens = Token::find()->where(['version' => '2'])->andWhere(['<>', 'lang', 'eng'])->andWhere(['<>', 'lang', 'en'])->andWhere(['<>', 'lang', 'es'])->all();
+                $tokens = Token::find()->andWhere(['<>', 'lang', 'eng'])->andWhere(['<>', 'lang', 'en'])->andWhere(['<>', 'lang', 'es'])->all();
                 // var_dump($tokens);die();
-                // $tokens = Token::find()->where(['id' => 1233])->all();
+                // $tokens = Token::find()->where(['id' => 1454])->all();
                 // $tokens = Token::find()->where(['id' => 1079])->all();
                 // sleep(600);
                 // for ($i = 1; $i<=100; $i++) {
@@ -457,8 +457,9 @@ class PushController extends Controller
         set_time_limit(1200);
         ini_set("max_execution_time", "1200");
         $tokens = Token::find()->andWhere(['version' => 3])->all();
-        // $tokens = Token::find()->andWhere(['id' => 1376])->all();
-        // $tokens = Token::find()->andWhere(['id' => 1316])->all();
+        // $tokens = Token::find()->andWhere(['id' => 1376])->all(); // - ios real
+        // $tokens = Token::find()->andWhere(['id' => 1453])->all(); // - andr sim
+        // $tokens = Token::find()->andWhere(['id' => 1436])->all(); // - andr real
         foreach ($tokens as $key => $token) {
             if (json_decode($token->token)->os == 'ios'){
                 $token_platform = 'ios';
@@ -527,6 +528,7 @@ class PushController extends Controller
                 $payload_body = strip_tags($payload_body);
                 if ($token_platform == 'ios'){
                     $payload = json_encode([
+                        "c_date" => $shedule_item['date'],
                         "aps" => [
                             "alert" => [
                                 "title" => $payload_title,
@@ -549,6 +551,7 @@ class PushController extends Controller
                         'data' => array(
                             'body' => array(
                                 'text' => $payload_body,
+                                'c_date' => $shedule_item['date'],
                             ),
                             'title' => $payload_title,
                         )
