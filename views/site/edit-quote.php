@@ -35,7 +35,13 @@
         <?= $form->field($model, 'text')->textarea(['rows' => '6', 'class' => 'gre'])->label('Текст статьи'); ?>
         <?= $form->field($model, 'text_eng')->textarea(['rows' => '6', 'class' => 'gre'])->label('Текст статьи (на английском)'); ?>
         <?= $form->field($model, 'text_es')->textarea(['rows' => '6', 'class' => 'gre'])->label('Текст статьи (на испанском)'); ?>
-        <?php $items = ArrayHelper::map(Item::find()->all(), 'id', 'name'); ?>
+        <?php 
+            $items = Item::find()->all();
+            foreach ($items as $key_item => $item) {
+                $items[$key_item]->name = $items[$key_item]->name.($items[$key_item]->name_eng ? ' (eng: '.$items[$key_item]->name_eng.')' : '').($items[$key_item]->name_es ? ' (es: '.$items[$key_item]->name_es.')' : '');
+            }
+            $items = ArrayHelper::map($items, 'id', 'name');
+        ?>
         <?= $form->field($model, 'item_id')->dropDownList($items); ?>        
         <div class="form-group">
             <?= Html::submitButton('Сохранить', ['class' => 'btn btn-primary']) ?>
