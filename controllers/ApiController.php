@@ -272,7 +272,7 @@ class ApiController extends Controller
         ]);
     }
 
-    public function actionSetToken($token, $settings, $news_settings = '["content","read","look","listen","important"]', $version = '1', $lang = 'ru'){
+    public function actionSetToken($token, $settings, $news_settings = '["content","read","look","listen","important"]', $version = '1', $lang = 'ru', $ecadash = '["holy", "ecadash"]'){
         if ($news_settings == 'news,read,look,listen,important' || $news_settings == "['news', 'read', 'look', 'listen', 'important']") {
             $news_settings = '["content","read","look","listen","important"]';
         }
@@ -306,6 +306,7 @@ class ApiController extends Controller
             $model->version = $version;
             $model->other = $token_clear;
             $model->lang = $lang;
+            $model->ecadash = $ecadash;
             if ($model->save()){
                 return 'success';
             } else {
@@ -325,6 +326,11 @@ class ApiController extends Controller
             // $model->news_settings = $news_settings;
             $model->version = $version;
             $model->lang = $lang;
+            if ($ecadash != 'old') {
+                $model->ecadash = $ecadash;
+            } else {
+                $model->ecadash = $model->ecadash;
+            }
             // var_dump($model);die();
             if ($model->update()){
                 return 'success';

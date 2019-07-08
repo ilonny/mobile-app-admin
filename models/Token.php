@@ -47,6 +47,7 @@ class Token extends \yii\db\ActiveRecord
             'other' => 'Other',
             'lang' => 'Lang',
             'error' => 'Error',
+            'ecadash' => 'Ecadash',
         ];
     }
 
