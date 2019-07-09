@@ -79,10 +79,8 @@ class PushController extends Controller
         
             if($development) {
                 $apns_url = 'gateway.sandbox.push.apple.com';
-                $apns_cert = 'apns-dev.pem';
             } else {
                 $apns_url = 'gateway.push.apple.com';
-                $apns_cert = 'apns-prod.pem';
             }
             if (file_exists($apns_cert)) 
             echo("cert file exists\n"); 
@@ -90,8 +88,6 @@ class PushController extends Controller
             echo("cert file not exists\n");; 
             $success = 0;
             $stream_context = stream_context_create();
-            stream_context_set_option($stream_context, 'ssl', 'local_cert', $apns_cert);
-            stream_context_set_option($stream_context, 'ssl', 'passphrase', 'Rh3xwaex9g');
         
             $apns = stream_socket_client('ssl://' . $apns_url . ':' . $apns_port, $error, $error_string, 2, STREAM_CLIENT_CONNECT, $stream_context);
             
@@ -166,6 +162,7 @@ class PushController extends Controller
             // $tokens = Token::find()->andWhere(['id' => 1178])->limit(1)->all();
             // $tokens = Token::find()->andWhere(['id' => 1172])->limit(1)->all();
             // $tokens = Token::find()->andWhere(['id' => 1453])->limit(1)->all();
+            // $tokens = Token::find()->andWhere(['id' => 1422])->limit(1)->all();
             foreach ($tokens as $token){
                 //удалим кривые токены
                     //пока не воркает нормально
@@ -235,7 +232,6 @@ class PushController extends Controller
                                 ],
                             ], JSON_UNESCAPED_UNICODE);
                             $device = $token->other;
-                            $curl_query = "curl -d '${payload}' --cert /var/www/www-root/data/www/app.harekrishna.ru/web/apns-prod.pem:Rh3xwaex9g -H \"apns-topic: org.reactjs.native.example.GuruOnline\" --http2  https://api.push.apple.com/3/device/${device}";
                             $curl_result = shell_exec($curl_query);
                             // var_dump($curl_query);
                             // var_dump($curl_result);
@@ -266,7 +262,6 @@ class PushController extends Controller
                             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
                             curl_setopt($ch, CURLOPT_HTTPHEADER, array(
                                 'Content-Type: application/json',
-                                'Authorization: key=AAAAmLg0GRc:APA91bGaOgw6-8zB6Q_o7A-Qf5BU7ofEQqM5UoMAgIySYgcFQ3aS1z9V9W-Wk9Xa9qRrqaQ47qfo7tzAi4uY-4IzgAPpesbwVOYZQ4QX94VFCQvGLpSS4qaOwJpritlwf-n7BWsvH5jO9sKZAyA56vdcL1Gt1mlKtg'
                             ));
                             $response = curl_exec($ch);
                             $response = json_decode($response, true);
@@ -405,8 +400,6 @@ class PushController extends Controller
                             ], JSON_UNESCAPED_UNICODE);
                             // echo $payload; die();
                             $device = $token->other;
-                            $curl_query = "curl -d '${payload}' --cert /var/www/www-root/data/www/app.harekrishna.ru/web/apns-prod.pem:Rh3xwaex9g -H \"apns-topic: org.reactjs.native.example.GuruOnline\" --http2  https://api.push.apple.com/3/device/${device}";
-                            // $curl_query = "curl -d '${payload}' --cert /var/www/www-root/data/www/app.harekrishna.ru/web/apns-dev.pem:Rh3xwaex9g -H \"apns-topic: org.reactjs.native.example.GuruOnline\" --http2  https://api.push.apple.com/3/device/${device}";
                             $curl_result = shell_exec($curl_query);
                             // var_dump($curl_query);
                             // var_dump($curl_result);
@@ -457,7 +450,7 @@ class PushController extends Controller
         set_time_limit(1200);
         ini_set("max_execution_time", "1200");
         $tokens = Token::find()->andWhere(['version' => 3])->all();
-        // $tokens = Token::find()->andWhere(['id' => 1376])->all(); // - ios real
+        // $tokens = Token::find()->andWhere(['id' => 1531])->all(); // - ios real
         // $tokens = Token::find()->andWhere(['id' => 1453])->all(); // - andr sim
         // $tokens = Token::find()->andWhere(['id' => 1436])->all(); // - andr real
         foreach ($tokens as $key => $token) {
@@ -476,7 +469,6 @@ class PushController extends Controller
             } else {
                 $lang = 'ru';
             }
-
             if (!$cities_shedule[$token_city][$lang]) {
                 if($curl = curl_init()) {
                     curl_setopt($curl, CURLOPT_URL, 'http://vaishnavacalendar.org/json/'.$token_city.'/534/'.$lang);
@@ -522,65 +514,79 @@ class PushController extends Controller
             // var_dump($tomorrow);die();
             // var_dump($shedule);die();
             if ($shedule_item) {
-                $payload_title = ($type == 'today' ? ($lang == 'ru' ? 'Сегодня: ' : 'Today: ').date('d.m.Y', strtotime($shedule_item['date'])) : ($lang == 'ru' ? 'Завтра ' : 'Tomorrow ').'('.date('d.m.Y', strtotime($tomorrow)).')');
-                $payload_body = (($shedule_item['festivals_str'] || $shedule_item['holy_days_str']) ? $shedule_item['festivals_str'].' '.$shedule_item['holy_days_str'] : ($shedule_item['shv_str'] ? $shedule_item['shv_str'] : ''));
-                $payload_title = strip_tags($payload_title);
-                $payload_body = strip_tags($payload_body);
-                if ($token_platform == 'ios'){
-                    $payload = json_encode([
-                        "c_date" => $shedule_item['date'],
-                        "aps" => [
-                            "alert" => [
-                                "title" => $payload_title,
-                                // "subtitle" => $quote->title,
-                                "body" => $payload_body
-                            ],
-                            "sound" => "default",
-                        ],
-                    ], JSON_UNESCAPED_UNICODE);
-                    $device = $token->other;
-                    $curl_query = "curl -d '${payload}' --cert /var/www/www-root/data/www/app.harekrishna.ru/web/apns-prod.pem:Rh3xwaex9g -H \"apns-topic: org.reactjs.native.example.GuruOnline\" --http2  https://api.push.apple.com/3/device/${device}";
-                    $curl_result = shell_exec($curl_query);
-                    // var_dump($curl_query);
-                    // var_dump($curl_result);
-                    // die();
+                $token_settings = $token->ecadash;
+                $need_push = false;
+                if ($token_settings == 'old' || !$token_settings) {
+                    $need_push = true;
                 } else {
-                    $android_push_body = json_encode([
-                        'to' => $token->other,
-                        "priority" => "high",
-                        'data' => array(
-                            'body' => array(
-                                'text' => $payload_body,
-                                'c_date' => $shedule_item['date'],
-                            ),
-                            'title' => $payload_title,
-                        )
-                    ], JSON_UNESCAPED_UNICODE);
-                    $ch = curl_init('https://fcm.googleapis.com/fcm/send');
-                    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
-                    curl_setopt($ch, CURLOPT_POSTFIELDS, $android_push_body);
-                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-                    curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-                        'Content-Type: application/json',
-                        'Authorization: key=AAAAmLg0GRc:APA91bGaOgw6-8zB6Q_o7A-Qf5BU7ofEQqM5UoMAgIySYgcFQ3aS1z9V9W-Wk9Xa9qRrqaQ47qfo7tzAi4uY-4IzgAPpesbwVOYZQ4QX94VFCQvGLpSS4qaOwJpritlwf-n7BWsvH5jO9sKZAyA56vdcL1Gt1mlKtg'
-                    ));
-                    $response = curl_exec($ch);
-                    $response = json_decode($response, true);
-                    try {
-                        if ($response['failure']){
-                            // if ($token->error == null) {
-                            //     $token->error  = '1';
-                            // } else {
-                            //     $token->error = strval($token->error+1);
-                            // }
-                            $token->error = json_encode($response);
-                            $token->update();
-                            // continue 2;
-                        } else {
-                            $token->error = '';
-                            $token->update();
-                        }
-                    } catch (Exception $e) {}
+                    $token_settings = json_decode($token_settings, true);   
+                    if ($shedule_item['shv_str'] && in_array('ecadash', $token_settings)) {
+                        $need_push = true;
+                    }
+                    if (($shedule_item['festivals_str'] || $shedule_item['holy_days_str']) && in_array('holy', $token_settings)) {
+                        $need_push = true;
+                    }
+                }
+                if ($need_push){
+                    $payload_title = ($type == 'today' ? ($lang == 'ru' ? 'Сегодня: ' : 'Today: ').date('d.m.Y', strtotime($shedule_item['date'])) : ($lang == 'ru' ? 'Завтра ' : 'Tomorrow ').'('.date('d.m.Y', strtotime($tomorrow)).')');
+                    $payload_body = (($shedule_item['festivals_str'] || $shedule_item['holy_days_str']) ? $shedule_item['festivals_str'].' '.$shedule_item['holy_days_str'] : ($shedule_item['shv_str'] ? $shedule_item['shv_str'] : ''));
+                    $payload_title = strip_tags($payload_title);
+                    $payload_body = strip_tags($payload_body);
+                    if ($token_platform == 'ios'){
+                        $payload = json_encode([
+                            "c_date" => $shedule_item['date'],
+                            "aps" => [
+                                "alert" => [
+                                    "title" => $payload_title,
+                                    // "subtitle" => $quote->title,
+                                    "body" => $payload_body
+                                ],
+                                "sound" => "default",
+                            ],
+                        ], JSON_UNESCAPED_UNICODE);
+                        $device = $token->other;
+                        $curl_result = shell_exec($curl_query);
+                        // var_dump($curl_query);
+                        // var_dump($curl_result);
+                        // die();
+                    } else {
+                        $android_push_body = json_encode([
+                            'to' => $token->other,
+                            "priority" => "high",
+                            'data' => array(
+                                'body' => array(
+                                    'text' => $payload_body,
+                                    'c_date' => $shedule_item['date'],
+                                ),
+                                'title' => $payload_title,
+                            )
+                        ], JSON_UNESCAPED_UNICODE);
+                        $ch = curl_init('https://fcm.googleapis.com/fcm/send');
+                        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+                        curl_setopt($ch, CURLOPT_POSTFIELDS, $android_push_body);
+                        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+                            'Content-Type: application/json',
+                            'Authorization: key=AAAAmLg0GRc:APA91bGaOgw6-8zB6Q_o7A-Qf5BU7ofEQqM5UoMAgIySYgcFQ3aS1z9V9W-Wk9Xa9qRrqaQ47qfo7tzAi4uY-4IzgAPpesbwVOYZQ4QX94VFCQvGLpSS4qaOwJpritlwf-n7BWsvH5jO9sKZAyA56vdcL1Gt1mlKtg'
+                        ));
+                        $response = curl_exec($ch);
+                        $response = json_decode($response, true);
+                        try {
+                            if ($response['failure']){
+                                // if ($token->error == null) {
+                                //     $token->error  = '1';
+                                // } else {
+                                //     $token->error = strval($token->error+1);
+                                // }
+                                $token->error = json_encode($response);
+                                $token->update();
+                                // continue 2;
+                            } else {
+                                $token->error = '';
+                                $token->update();
+                            }
+                        } catch (Exception $e) {}
+                    }
                 }
             }
         }
