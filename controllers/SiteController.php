@@ -211,12 +211,114 @@ class SiteController extends Controller
     }
 
     public function actionPush(){
+        set_time_limit(1200);
+        ini_set("max_execution_time", "1200");
+        $tokens = Token::find()->all();
         $pushes = Push::find()->all();
+        // var_dump($tokens);die();
         $model = new Push;
         if ($model->load(Yii::$app->request->post())){
             if ($model->save()){
-                Token::sendPushForGroupAndroidWithAction($model->payload);
-                Token::sendPushForGroupWithAction($model->payload);
+                // Token::sendPushForGroupAndroidWithAction($model->payload);
+                // Token::sendPushForGroupWithAction($model->payload);
+                foreach ($tokens as $key => $token) {
+                    // if ($token->id == 1707) {
+                    // if ($token->id == 1625) {
+                        // var_dump($token->id);
+                        // die();
+                        if (json_decode($token->token)->os == 'ios'){
+                            $token_platform = 'ios';
+                        } else {
+                            $token_platform = 'android';
+                        }
+                        if ($token->lang == 'eng' || $token->lang == 'en') {
+                            $lang = 'en';
+                        } else if ($token->lang == 'es') {
+                            $lang = 'es';
+                        } else {
+                            $lang = 'ru';
+                        }
+                        $payload_title = '';
+                        if ($lang == 'es') {
+                            $payload_body = $model->payload_es;
+                        } else if ($lang == 'en') {
+                            $payload_body = $model->payload_eng;
+                        } else {
+                            $payload_body = $model->payload;
+                        }
+                        // $payload_body = $lang == 'ru' ? $model->payload : $lang == 'en' ? $model->payload_eng : $model->payload_es;
+                        // $payload_title = strip_tags($payload_title);
+                        // $payload_body = strip_tags($payload_body);
+                        // var_dump($payload_body);die();
+                        if ($payload_body) {
+                            
+                            if ($token_platform == 'ios'){
+                                $payload = json_encode([
+                                    "need_alert" => true,
+                                    "aps" => [
+                                        // "alert" => [
+                                        //     "title" => $payload_title,
+                                        //     // "subtitle" => $quote->title,
+                                        //     "body" => $payload_body
+                                        // ],
+                                        "alert" => $payload_body,
+                                        "sound" => "default",
+                                    ],
+                                ], JSON_UNESCAPED_UNICODE);
+                                $device = $token->other;
+                                $curl_query = "curl -d '${payload}' --cert /var/www/www-root/data/www/app.harekrishna.ru/web/GuruOnlineApns.pem:Rh3xwaex9g -H \"apns-topic: org.reactjs.native.example.GuruOnline\" --http2  https://api.push.apple.com/3/device/${device}";
+                                $curl_result = shell_exec($curl_query);
+                                var_dump($curl_query);
+                                var_dump($curl_result);
+                                // file_put_contents('alert_push.txt', 'start ', FILE_APPEND);
+                                // file_put_contents('alert_push.txt', print_r($curl_query, true), FILE_APPEND);
+                                // file_put_contents('alert_push.txt', print_r($curl_result, true), FILE_APPEND);
+                                // file_put_contents('alert_push.txt', ' end ', FILE_APPEND);
+                                // die();
+                            } else {
+                                $android_push_body = json_encode([
+                                    'to' => $token->other,
+                                    "priority" => "high",
+                                    'data' => array(
+                                        'body' => array(
+                                            'text' => $payload_body,
+                                            'need_alert' => true,
+                                        ),
+                                        'title' => $payload_title,
+                                    )
+                                ], JSON_UNESCAPED_UNICODE);
+                                $ch = curl_init('https://fcm.googleapis.com/fcm/send');
+                                curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+                                curl_setopt($ch, CURLOPT_POSTFIELDS, $android_push_body);
+                                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                                curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+                                    'Content-Type: application/json',
+                                    'Authorization: key=AAAAmLg0GRc:APA91bGaOgw6-8zB6Q_o7A-Qf5BU7ofEQqM5UoMAgIySYgcFQ3aS1z9V9W-Wk9Xa9qRrqaQ47qfo7tzAi4uY-4IzgAPpesbwVOYZQ4QX94VFCQvGLpSS4qaOwJpritlwf-n7BWsvH5jO9sKZAyA56vdcL1Gt1mlKtg'
+                                ));
+                                $response = curl_exec($ch);
+                                $response = json_decode($response, true);
+                                // file_put_contents('alert_push.txt', 'start ', FILE_APPEND);
+                                // file_put_contents('alert_push.txt', print_r($response, true), FILE_APPEND);
+                                // file_put_contents('alert_push.txt', ' end ', FILE_APPEND);
+                                try {
+                                    if ($response['failure']){
+                                        // if ($token->error == null) {
+                                        //     $token->error  = '1';
+                                        // } else {
+                                        //     $token->error = strval($token->error+1);
+                                        // }
+                                        $token->error = json_encode($response);
+                                        $token->update();
+                                        // continue 2;
+                                    } else {
+                                        $token->error = '';
+                                        $token->update();
+                                    }
+                                } catch (Exception $e) {}
+                            }
+                        // }
+                    }
+                }
                 $this->redirect('/site/push');
             }
         }

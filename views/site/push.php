@@ -28,13 +28,17 @@
                             <tr>
                                 <th>id</th>
                                 <th>Текст</th>
+                                <th>Текст на английском</th>
+                                <th>Текст на испанском</th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php foreach ($pushes as $push): ?>
                                 <tr>
                                     <td><?= $push->id; ?></td>
-                                    <td><?= $push->payload; ?></td>                                    
+                                    <td><?= $push->payload; ?></td>
+                                    <td><?= $push->payload_eng; ?></td>
+                                    <td><?= $push->payload_es; ?></td>
                                 </tr>
                             <?php endforeach; ?>
                         </tbody>
@@ -45,7 +49,9 @@
                         $form = ActiveForm::begin();
                         $model = new Push;
                     ?>
-                    <?= $form->field($model, 'payload')->textInput()->label('Текст уведомления (желательно не больше 120 символов'); ?>
+                    <?= $form->field($model, 'payload')->textInput()->label('Текст уведомления'); ?>
+                    <?= $form->field($model, 'payload_eng')->textInput()->label('Текст уведомления для английской версии'); ?>
+                    <?= $form->field($model, 'payload_es')->textInput()->label('Текст уведомления для испанской версии'); ?>
                     <div class="form-group">
                         <?= Html::submitButton('Отправить', ['class' => 'btn btn-primary']) ?>
                     </div>

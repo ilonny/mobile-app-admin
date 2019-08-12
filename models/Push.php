@@ -9,6 +9,8 @@ use Yii;
  *
  * @property int $id
  * @property string $payload
+ * @property string $payload_eng
+ * @property string $payload_es
  * @property string $other
  */
 class Push extends \yii\db\ActiveRecord
@@ -27,9 +29,7 @@ class Push extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['payload'], 'required'],
-            [['other'], 'string'],
-            [['payload'], 'string', 'max' => 255],
+            [['payload', 'payload_eng', 'payload_es', 'other'], 'string'],
         ];
     }
 
@@ -41,6 +41,8 @@ class Push extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'payload' => 'Payload',
+            'payload_eng' => 'Payload Eng',
+            'payload_es' => 'Payload Es',
             'other' => 'Other',
         ];
     }

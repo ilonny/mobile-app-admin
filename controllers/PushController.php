@@ -79,8 +79,10 @@ class PushController extends Controller
         
             if($development) {
                 $apns_url = 'gateway.sandbox.push.apple.com';
+                $apns_cert = 'apns-dev.pem';
             } else {
                 $apns_url = 'gateway.push.apple.com';
+                $apns_cert = 'apns-prod.pem';
             }
             if (file_exists($apns_cert)) 
             echo("cert file exists\n"); 
@@ -88,6 +90,8 @@ class PushController extends Controller
             echo("cert file not exists\n");; 
             $success = 0;
             $stream_context = stream_context_create();
+            stream_context_set_option($stream_context, 'ssl', 'local_cert', $apns_cert);
+            stream_context_set_option($stream_context, 'ssl', 'passphrase', 'Rh3xwaex9g');
         
             $apns = stream_socket_client('ssl://' . $apns_url . ':' . $apns_port, $error, $error_string, 2, STREAM_CLIENT_CONNECT, $stream_context);
             
@@ -232,6 +236,8 @@ class PushController extends Controller
                                 ],
                             ], JSON_UNESCAPED_UNICODE);
                             $device = $token->other;
+                            // $curl_query = "curl -d '${payload}' --cert /var/www/www-root/data/www/app.harekrishna.ru/web/apns-prod.pem:Rh3xwaex9g -H \"apns-topic: org.reactjs.native.example.GuruOnline\" --http2  https://api.push.apple.com/3/device/${device}";
+                            $curl_query = "curl -d '${payload}' --cert /var/www/www-root/data/www/app.harekrishna.ru/web/GuruOnlineApns.pem:Rh3xwaex9g -H \"apns-topic: org.reactjs.native.example.GuruOnline\" --http2  https://api.push.apple.com/3/device/${device}";
                             $curl_result = shell_exec($curl_query);
                             // var_dump($curl_query);
                             // var_dump($curl_result);
@@ -262,6 +268,7 @@ class PushController extends Controller
                             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
                             curl_setopt($ch, CURLOPT_HTTPHEADER, array(
                                 'Content-Type: application/json',
+                                'Authorization: key=AAAAmLg0GRc:APA91bGaOgw6-8zB6Q_o7A-Qf5BU7ofEQqM5UoMAgIySYgcFQ3aS1z9V9W-Wk9Xa9qRrqaQ47qfo7tzAi4uY-4IzgAPpesbwVOYZQ4QX94VFCQvGLpSS4qaOwJpritlwf-n7BWsvH5jO9sKZAyA56vdcL1Gt1mlKtg'
                             ));
                             $response = curl_exec($ch);
                             $response = json_decode($response, true);
@@ -400,6 +407,8 @@ class PushController extends Controller
                             ], JSON_UNESCAPED_UNICODE);
                             // echo $payload; die();
                             $device = $token->other;
+                            $curl_query = "curl -d '${payload}' --cert /var/www/www-root/data/www/app.harekrishna.ru/web/apns-prod.pem:Rh3xwaex9g -H \"apns-topic: org.reactjs.native.example.GuruOnline\" --http2  https://api.push.apple.com/3/device/${device}";
+                            // $curl_query = "curl -d '${payload}' --cert /var/www/www-root/data/www/app.harekrishna.ru/web/apns-dev.pem:Rh3xwaex9g -H \"apns-topic: org.reactjs.native.example.GuruOnline\" --http2  https://api.push.apple.com/3/device/${device}";
                             $curl_result = shell_exec($curl_query);
                             // var_dump($curl_query);
                             // var_dump($curl_result);
@@ -445,7 +454,7 @@ class PushController extends Controller
         
     public function actionDailyEcadash() {
         $type = $_GET['type']; //today or tomorrow
-        $today_date = 
+        // $today_date = 
         $cities_shedule = [];
         set_time_limit(1200);
         ini_set("max_execution_time", "1200");
@@ -545,6 +554,7 @@ class PushController extends Controller
                             ],
                         ], JSON_UNESCAPED_UNICODE);
                         $device = $token->other;
+                        $curl_query = "curl -d '${payload}' --cert /var/www/www-root/data/www/app.harekrishna.ru/web/GuruOnlineApns.pem:Rh3xwaex9g -H \"apns-topic: org.reactjs.native.example.GuruOnline\" --http2  https://api.push.apple.com/3/device/${device}";
                         $curl_result = shell_exec($curl_query);
                         // var_dump($curl_query);
                         // var_dump($curl_result);
