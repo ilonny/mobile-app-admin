@@ -103,7 +103,7 @@
                             $items[$key_item]->name = $items[$key_item]->name.($items[$key_item]->name_eng ? ' (eng: '.$items[$key_item]->name_eng.')' : '').($items[$key_item]->name_es ? ' (es: '.$items[$key_item]->name_es.')' : '');
                         }
                         $items = ArrayHelper::map($items, 'id', 'name');
-                        ?>
+                    ?>
                     <?= $form->field($model, 'item_id')->dropDownList($items)->label('Источник'); ?>
                     <?//= $form->field($model, 'item_type_id')->textInput(['type' => 'hidden', 'value' => $type == 'author' ? '1' : '2'])->label(false); ?>
                     <div class="form-group">
