@@ -407,7 +407,7 @@ class PushController extends Controller
                             ], JSON_UNESCAPED_UNICODE);
                             // echo $payload; die();
                             $device = $token->other;
-                            $curl_query = "curl -d '${payload}' --cert /var/www/www-root/data/www/app.harekrishna.ru/web/apns-prod.pem:Rh3xwaex9g -H \"apns-topic: org.reactjs.native.example.GuruOnline\" --http2  https://api.push.apple.com/3/device/${device}";
+                            $curl_query = "curl -d '${payload}' --cert /var/www/www-root/data/www/app.harekrishna.ru/web/GuruOnlineApns.pem:Rh3xwaex9g -H \"apns-topic: org.reactjs.native.example.GuruOnline\" --http2  https://api.push.apple.com/3/device/${device}";
                             // $curl_query = "curl -d '${payload}' --cert /var/www/www-root/data/www/app.harekrishna.ru/web/apns-dev.pem:Rh3xwaex9g -H \"apns-topic: org.reactjs.native.example.GuruOnline\" --http2  https://api.push.apple.com/3/device/${device}";
                             $curl_result = shell_exec($curl_query);
                             // var_dump($curl_query);
@@ -442,7 +442,7 @@ class PushController extends Controller
                         }
                     }
                 }
-                file_put_contents('bitrix_push.txt', 'start ', FILE_APPEND);
+                file_put_contents('bitrix_push.txt', 'start '.time(), FILE_APPEND);
                 file_put_contents('bitrix_push.txt', print_r($data, true), FILE_APPEND);
                 file_put_contents('bitrix_push.txt', print_r($curl_query, true), FILE_APPEND);
                 file_put_contents('bitrix_push.txt', print_r($curl_result, true), FILE_APPEND);

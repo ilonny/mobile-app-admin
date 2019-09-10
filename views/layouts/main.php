@@ -36,17 +36,15 @@ AppAsset::register($this);
             'class' => 'navbar-inverse navbar-fixed-top',
         ],
     ]);
-    echo Nav::widget([
-        'options' => ['class' => 'navbar-nav navbar-right'],
-        'items' => [
-            ['label' => 'Авторы', 'url' => ['/site/list', 'type' => 'author']],
-            ['label' => 'Книги', 'url' => ['/site/list', 'type' => 'books']],
-            ['label' => 'Цитаты', 'url' => ['/site/quotes']],
-            ['label' => 'Читалка', 'url' => ['/reader/index']],
-            ['label' => 'Аудиокниги', 'url' => ['/audio/index']],
-            Yii::$app->user->isGuest ? (
-                ['label' => 'Войти', 'url' => ['/site/login']]
-            ) : (
+    if (Yii::$app->user->identity->username == 'admin') {
+        echo Nav::widget([
+            'options' => ['class' => 'navbar-nav navbar-right'],
+            'items' => [
+                ['label' => 'Авторы', 'url' => ['/site/list', 'type' => 'author']],
+                ['label' => 'Книги', 'url' => ['/site/list', 'type' => 'books']],
+                ['label' => 'Цитаты', 'url' => ['/site/quotes']],
+                ['label' => 'Читалка', 'url' => ['/reader/index']],
+                ['label' => 'Аудиокниги', 'url' => ['/audio/index']],
                 '<li>'
                 . Html::beginForm(['/site/logout'], 'post')
                 . Html::submitButton(
@@ -55,9 +53,42 @@ AppAsset::register($this);
                 )
                 . Html::endForm()
                 . '</li>'
-            )
-        ],
-    ]);
+            ],
+        ]);        
+    } else if (!Yii::$app->user->isGuest) {
+        echo Nav::widget([
+            'options' => ['class' => 'navbar-nav navbar-right'],
+            'items' => [
+                ['label' => 'Отправить Push уведомление', 'url' => ['/site/push']],
+                '<li>'
+                . Html::beginForm(['/site/logout'], 'post')
+                . Html::submitButton(
+                    'Выйти (' . Yii::$app->user->identity->username . ')',
+                    ['class' => 'btn btn-link logout']
+                )
+                . Html::endForm()
+                . '</li>'
+            ],
+        ]); 
+    } else {
+        echo Nav::widget([
+            'options' => ['class' => 'navbar-nav navbar-right'],
+            'items' => [
+                Yii::$app->user->isGuest ? (
+                    ['label' => 'Войти', 'url' => ['/site/login']]
+                ) : (
+                    '<li>'
+                    . Html::beginForm(['/site/logout'], 'post')
+                    . Html::submitButton(
+                        'Выйти (' . Yii::$app->user->identity->username . ')',
+                        ['class' => 'btn btn-link logout']
+                    )
+                    . Html::endForm()
+                    . '</li>'
+                )
+            ],
+        ]);
+    }
     NavBar::end();
     ?>
 

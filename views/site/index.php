@@ -7,9 +7,10 @@ $this->title = 'Mobile app Admin Panel';
 <div class="site-index">
     <div class="jumbotron">
         <h1>Добро пожаловать!</h1>
-        <p class="lead">Выберите категорию для редактирования</p>
+        <!-- <p class="lead">Выберите категорию для редактирования</p> -->
         <p><a class="btn btn-lg btn-success" href="mailto::hello@fflames.ru">Задать вопрос разработчикам</a></p>
     </div>
+    <?php if (Yii::$app->user->identity->username == 'admin') :?>
     <div class="body-content">
         <div class="row">
             <div class="col-lg-4 col-xs-12">
@@ -44,4 +45,12 @@ $this->title = 'Mobile app Admin Panel';
             </div>
         </div>
     </div>
+    <?php endif; ?>
+    <?php if (!Yii::$app->user->isGuest) : ?>
+        <div class="col-lg-4 col-xs-12">
+            <h2>Send Push </h2>
+            <p>Отправить пуш-уведомление для города</p>
+            <p><a class="btn btn-default" href="<?= Url::to(['site/push']); ?>">Перейти</a></p>
+        </div>
+    <?php endif; ?>
 </div>

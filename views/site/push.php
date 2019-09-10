@@ -30,6 +30,7 @@
                                 <th>Текст</th>
                                 <th>Текст на английском</th>
                                 <th>Текст на испанском</th>
+                                <th>Город</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -39,6 +40,7 @@
                                     <td><?= $push->payload; ?></td>
                                     <td><?= $push->payload_eng; ?></td>
                                     <td><?= $push->payload_es; ?></td>
+                                    <td><?= $push->other; ?></td>
                                 </tr>
                             <?php endforeach; ?>
                         </tbody>
@@ -52,6 +54,42 @@
                     <?= $form->field($model, 'payload')->textInput()->label('Текст уведомления'); ?>
                     <?= $form->field($model, 'payload_eng')->textInput()->label('Текст уведомления для английской версии'); ?>
                     <?= $form->field($model, 'payload_es')->textInput()->label('Текст уведомления для испанской версии'); ?>
+                    <?php if (Yii::$app->user->identity->username == 'admin'): ?>
+                        <?
+                            $items = [
+                                'admin' => 'Все',
+                                'moscow' => 'Москва',
+                                'saint_petersburg' => 'Санкт-Петербург',
+                                'sukhum' => 'Сухум',
+                                'sochi' => 'Сочи',
+                                'khabarovsk' => 'Хабаровск',
+                                'tomsk' => 'Томск',
+                                'nizhny_novgorod' => 'Нижний Новгород',
+                                'novgorod_the_great' => 'Великий Новгород',
+                                'orsk' => 'Орск',
+                                'izhevsk' => 'Ижевск',
+                                'kyiv' => 'Киев',
+                                'kharkiv' => 'Харьков',
+                                'khokhlovka' => 'Хохловка',
+                            ];
+                            $params = [
+                                'options' => [
+                                    '1' => [
+                                        'Selected' => true,
+                                        // 'data-test' => 100,
+                                    ],
+                                    '2' => [
+                                        // 'data-test' => 107,
+                                    ],
+                                ],
+                            ];
+                            echo $form->field($model, 'other', [
+                                'inputOptions' => ['class' => 'form-control'],
+                            ])->dropDownList($items, $params)->label("Город");
+                        ?>
+                    <?php else: ?>
+                        <?= $form->field($model, 'other')->hiddenInput(['value' => Yii::$app->user->identity->username])->label(''); ?>
+                    <?php endif; ?>
                     <div class="form-group">
                         <?= Html::submitButton('Отправить', ['class' => 'btn btn-primary']) ?>
                     </div>

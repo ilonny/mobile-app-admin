@@ -171,8 +171,8 @@ class SiteController extends Controller
             $answer = 'Произошла ошибка';
         }
     }
-    
-    
+
+
     public function actionQuotes(){
         if ($_GET['item_id']) {
             $quotes = Quote::find()->andWhere(['item_id' => $_GET['item_id']])->orderBy('id DESC')->all();
@@ -211,10 +211,19 @@ class SiteController extends Controller
     }
 
     public function actionPush(){
+        $city_name = null;
+        if (Yii::$app->user->identity->username != 'admin') {
+            $city_name = Yii::$app->user->identity->username;
+        }
         set_time_limit(1200);
         ini_set("max_execution_time", "1200");
-        $tokens = Token::find()->all();
-        $pushes = Push::find()->all();
+        if ($city_name) {
+            $pushes = Push::find()->andWhere(['other' => $city_name])->all();
+            $tokens = Token::find()->andWhere(['city' => $city_name])->all();
+        } else {
+            $pushes = Push::find()->all();
+            $tokens = Token::find()->all();
+        }
         // var_dump($tokens);die();
         $model = new Push;
         if ($model->load(Yii::$app->request->post())){
@@ -251,7 +260,6 @@ class SiteController extends Controller
                         // $payload_body = strip_tags($payload_body);
                         // var_dump($payload_body);die();
                         if ($payload_body) {
-                            
                             if ($token_platform == 'ios'){
                                 $payload = json_encode([
                                     "need_alert" => true,
