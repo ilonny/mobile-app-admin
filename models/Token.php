@@ -30,7 +30,7 @@ class Token extends \yii\db\ActiveRecord
     {
         return [
             [['token', 'settings'], 'required'],
-            [['token', 'settings', 'other', 'error'], 'string'],
+            [['token', 'settings', 'other', 'error', 'city_push'], 'string'],
             [['lang'], 'string', 'max' => 255],
         ];
     }
@@ -48,6 +48,7 @@ class Token extends \yii\db\ActiveRecord
             'lang' => 'Lang',
             'error' => 'Error',
             'ecadash' => 'Ecadash',
+            'city_push' => 'CityPush',
         ];
     }
 

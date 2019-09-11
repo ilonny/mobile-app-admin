@@ -856,6 +856,19 @@ class ApiController extends Controller
             echo 'token not found';
         }
     }
+    public function actionSetCityPush() {
+        $token = Token::find()->where(['like', 'token', $_GET['token']])->one();
+        if (!$token) {
+            $token = Token::find()->where(['token' => $_GET['token']])->one();
+        }
+        if ($token) {
+            $token->city_push = $_GET['agreement'];
+            $token->update();
+            echo 'success';
+        } else {
+            echo 'token not found';
+        }
+    }
     public function actionGetEcadashCalendar($city = 'moscow', $lang = 'ru') {
         if($curl = curl_init()) {
             curl_setopt($curl, CURLOPT_URL, 'http://vaishnavacalendar.org/json/'.$city.'/534/'.$lang);
