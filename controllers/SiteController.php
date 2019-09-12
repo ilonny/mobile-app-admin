@@ -214,16 +214,22 @@ class SiteController extends Controller
         $city_name = null;
         if (Yii::$app->user->identity->username != 'admin') {
             $city_name = Yii::$app->user->identity->username;
+        } else {
+            if ($_POST['Push']['other'] != 'admin') {
+                $city_name = $_POST['Push']['other'];
+            }
         }
         set_time_limit(1200);
         ini_set("max_execution_time", "1200");
         if ($city_name) {
             $pushes = Push::find()->andWhere(['other' => $city_name])->all();
-            $tokens = Token::find()->andWhere(['city' => $city_name])->all();
+            $tokens = Token::find()->andWhere(['city' => $city_name])->andWhere(['city_push' => 1])->andWhere(['id' => 1802])->all();
         } else {
             $pushes = Push::find()->all();
             $tokens = Token::find()->all();
+            $tokens = [];
         }
+
         // var_dump($tokens);die();
         $model = new Push;
         if ($model->load(Yii::$app->request->post())){
