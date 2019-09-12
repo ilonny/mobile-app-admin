@@ -870,6 +870,9 @@ class ApiController extends Controller
         }
     }
     public function actionGetEcadashCalendar($city = 'moscow', $lang = 'ru') {
+        if ($city == 'orsk' || $city == 'izhevsk' || $city == 'khokhlovka') {
+            $city = 'moscow';
+        }
         if($curl = curl_init()) {
             curl_setopt($curl, CURLOPT_URL, 'http://vaishnavacalendar.org/json/'.$city.'/534/'.$lang);
             curl_setopt($curl, CURLOPT_RETURNTRANSFER,true);

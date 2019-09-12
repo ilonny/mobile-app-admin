@@ -223,11 +223,10 @@ class SiteController extends Controller
         ini_set("max_execution_time", "1200");
         if ($city_name) {
             $pushes = Push::find()->andWhere(['other' => $city_name])->all();
-            $tokens = Token::find()->andWhere(['city' => $city_name])->andWhere(['city_push' => 1])->andWhere(['id' => 1802])->all();
+            $tokens = Token::find()->andWhere(['city' => $city_name])->andWhere(['city_push' => 1])->all();
         } else {
             $pushes = Push::find()->all();
             $tokens = Token::find()->all();
-            $tokens = [];
         }
 
         // var_dump($tokens);die();
