@@ -46,7 +46,7 @@ $this->title = 'Mobile app Admin Panel';
         </div>
     </div>
     <?php endif; ?>
-    <?php if (!Yii::$app->user->isGuest) : ?>
+    <?php if (!Yii::$app->user->isGuest && Yii::$app->user->identity->username != 'admin') : ?>
         <div class="col-lg-4 col-xs-12">
             <h2>Send Push </h2>
             <p>Отправить пуш-уведомление для города</p>
