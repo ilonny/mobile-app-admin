@@ -18,6 +18,7 @@ use app\models\AudioAuthor;
 use app\models\AudioBook;
 use app\models\Audiofile;
 use app\models\Toc;
+use app\models\Push;
 use yii\web\UploadedFile;
 use yii\helpers\Json;
 
@@ -857,6 +858,7 @@ class ApiController extends Controller
         }
     }
     public function actionSetCityPush() {
+        file_put_contents('test.txt', var_export($_GET), FILE_APPEND);
         $token = Token::find()->where(['like', 'token', $_GET['token']])->one();
         if (!$token) {
             $token = Token::find()->where(['token' => $_GET['token']])->one();
@@ -904,5 +906,45 @@ class ApiController extends Controller
             echo json_encode($result, JSON_UNESCAPED_UNICODE);
             die();
         }
+    }
+    public function actionGetCityNotifications($city, $lang = 'ru'){
+        $res = [];
+        if (!$city) {
+            return json_encode($res);
+        }
+        if ($lang == 'ru') {
+            $res = Push::find()
+                ->andWhere(['other' => $city])
+                ->andWhere(['is not', 'payload', NULL])
+                ->andWhere(['<>', 'payload', ''])
+                ->orderBy('id DESC')
+                ->all();
+        } else if ($lang == 'es') {
+            $res = Push::find()
+            ->andWhere(['other' => $city])
+            ->andWhere(['is not', 'payload_es', NULL])
+            ->andWhere(['<>', 'payload_es', ''])
+            ->orderBy('id DESC')
+            ->all();
+        } else {
+            $res = Push::find()
+            ->andWhere(['other' => $city])
+            ->andWhere(['is not', 'payload_eng', NULL])
+            ->andWhere(['<>', 'payload_eng', ''])
+            ->orderBy('id DESC')
+            ->all();
+        }
+        $response = [];
+        foreach ($res as $key => $r) {
+            array_push($response, [
+                'id' => $r->id,
+                'payload' => $r->payload,
+                'payload_eng' => $r->payload_eng,
+                'payload_es' => $r->payload_es,
+                'date' => $r->date_ins ? date('d.m.Y', strtotime($r->date_ins)) : '',
+            ]);
+        }
+        // var_dump($response);
+        return json_encode($response, JSON_UNESCAPED_UNICODE);
     }
 }

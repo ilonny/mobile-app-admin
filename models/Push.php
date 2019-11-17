@@ -12,6 +12,7 @@ use Yii;
  * @property string $payload_eng
  * @property string $payload_es
  * @property string $other
+ * @property string $date_ins
  */
 class Push extends \yii\db\ActiveRecord
 {
@@ -30,6 +31,7 @@ class Push extends \yii\db\ActiveRecord
     {
         return [
             [['payload', 'payload_eng', 'payload_es', 'other'], 'string'],
+            [['date_ins'], 'safe'],
         ];
     }
 
@@ -44,6 +46,7 @@ class Push extends \yii\db\ActiveRecord
             'payload_eng' => 'Payload Eng',
             'payload_es' => 'Payload Es',
             'other' => 'Other',
+            'date_ins' => 'Date Ins',
         ];
     }
 }
