@@ -281,8 +281,8 @@ class SiteController extends Controller
                                 $device = $token->other;
                                 $curl_query = "curl -d '${payload}' --cert /var/www/www-root/data/www/app.harekrishna.ru/web/GuruOnlineApns.pem:Rh3xwaex9g -H \"apns-topic: org.reactjs.native.example.GuruOnline\" --http2  https://api.push.apple.com/3/device/${device}";
                                 $curl_result = shell_exec($curl_query);
-                                var_dump($curl_query);
-                                var_dump($curl_result);
+                                // var_dump($curl_query);
+                                // var_dump($curl_result);
                                 // file_put_contents('alert_push.txt', 'start ', FILE_APPEND);
                                 // file_put_contents('alert_push.txt', print_r($curl_query, true), FILE_APPEND);
                                 // file_put_contents('alert_push.txt', print_r($curl_result, true), FILE_APPEND);

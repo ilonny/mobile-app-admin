@@ -947,4 +947,16 @@ class ApiController extends Controller
         // var_dump($response);
         return json_encode($response, JSON_UNESCAPED_UNICODE);
     }
+    public function actionWebViewPlayer($id){
+        $id = intval($id);
+        $model = Audiofile::findOne($id);
+        $this->layout = 'api';
+        if (!$id || !$model){
+            return 'wrong parameters';
+        }
+        return $this->render('web-view-player', [
+            'model' => $model,
+            // 'lang' => $lang
+        ]);
+    }
 }
